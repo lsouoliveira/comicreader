@@ -4,7 +4,7 @@
 			<v-toolbar-title class="title">Comic Reader</v-toolbar-title>
 		</v-app-bar>
 		<v-main>
-			<v-container grid-list-lg>
+			<v-container>
 				<library/>
 			</v-container>
 		</v-main>

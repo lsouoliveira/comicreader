@@ -1,9 +1,9 @@
 <template>
-		<v-layout class="row wrap">
-			<v-flex v-for="n in 9" :key="n" xs4 sm3 md2 lg2 xl1>
-				<library-item />
-			</v-flex>
-		</v-layout>
+	<div class="library">
+		<div v-for="n in 12" :key="n">
+			<library-item :isAvailable="true" @click="() => handleLibraryItemClick(n)" />
+		</div>
+	</div>
 </template>
 
 <script>
@@ -16,3 +16,11 @@
 		}
 	};
 </script>
+
+<style>
+	.library {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(158px, 1fr));
+		gap: 16px;
+	}
+</style>

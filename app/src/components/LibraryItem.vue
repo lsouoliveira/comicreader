@@ -1,28 +1,73 @@
 <template>
-	<div class="d-flex flex-column" v-ripple>
-		<img src="onepiece_vol1_cover.jpg" class="elevation-2 thumbnail">
-		<div class="subtitle-2 text-center pa-2 text-truncate">Vol 1 - One piece</div>
+	<div class="library-item d-flex flex-column" @click="handleClick">
+		<v-card>
+			<div class="thumbnail" :class="classObject">
+				<img src="onepiece_vol1_cover.jpg" class="thumbnail__image"/>
+			</div>
+			<v-card-text>
+				<div class="d-flex align-center justify-space-between">
+					<div class="text-truncate">Vol 1 - One piece</div>
+					<v-btn icon>
+						<v-icon>mdi-dots-vertical</v-icon>
+					</v-btn>
+				</div>
+				<div>
+					<v-chip color="green" text-color="white">Lido</v-chip>
+				</div>
+			</v-card-text>
+		</v-card>
 	</div>
 </template>
 
 <script>
 	export default {
-		name: 'LibraryItem'
+		name: 'LibraryItem',
+		props: {
+			isAvailable: {
+				type: Boolean,
+				default: false
+			}
+		},
+		methods: {
+			handleClick() {
+				this.$emit('click');
+			}
+		},
+		computed: {
+			classObject() {
+				return {
+					'thumbnail--processing': !this.isAvailable
+				}
+			}
+		}
 	};
 </script>
 
-<style scoped>
-	.thumbnail {
+<style>
+	.library-item {
 		position: relative;
-		border: 10px solid black !important;
 	}
 
-	.thumbnail::after {
-		position: absolute;	
-		top: 0px;
-		left: 0px;
+	.thumbnail {
+		display: flex;
+		justify-content: center;
+		position: relative;
+	}
+
+	.thumbnail--processing.thumbnail:after {
+		content: '';
+		position: absolute;
+		top: 0;
+		height: 0;
 		width: 100%;
 		height: 100%;
-		background-color: red; 
+		background-color: #e0e0e0;
+		opacity: 0.6;
 	}
+
+	.thumbnail__image {
+		position: relative;
+		max-width: 100%;
+	}
+
 </style>
