@@ -1,18 +1,29 @@
 <template>
 	<div class="library-item d-flex flex-column" @click="handleClick">
 		<v-card>
-			<div class="thumbnail" :class="classObject">
-				<img src="onepiece_vol1_cover.jpg" class="thumbnail__image"/>
+			<div class="thumbnail" :class="classObject"> <img src="onepiece_vol1_cover.jpg" class="thumbnail__image"/>
 			</div>
 			<v-card-text>
 				<div class="d-flex align-center justify-space-between">
 					<div class="text-truncate">Vol 1 - One piece</div>
-					<v-btn icon>
-						<v-icon>mdi-dots-vertical</v-icon>
-					</v-btn>
+					<v-menu offset-y>
+						<template v-slot:activator="{ on, attrs }">
+							<v-btn 
+								icon
+								v-bind="attrs"
+								v-on="on">
+								<v-icon>mdi-dots-vertical</v-icon>
+							</v-btn>
+						</template>
+						<v-list>
+							<v-list-item link>
+								<v-list-item-title>Mark as read</v-list-item-title>
+							</v-list-item>
+							</v-list>
+					</v-menu>
 				</div>
 				<div>
-					<v-chip color="green" text-color="white">Lido</v-chip>
+					<v-chip color="green" text-color="white" v-if="read">Lido</v-chip>
 				</div>
 			</v-card-text>
 		</v-card>
@@ -24,6 +35,10 @@
 		name: 'LibraryItem',
 		props: {
 			isAvailable: {
+				type: Boolean,
+				default: false
+			},
+			read: {
 				type: Boolean,
 				default: false
 			}
