@@ -1,7 +1,10 @@
 <template>
 	<div class="library-item d-flex flex-column" @click="handleClick">
-		<v-card>
-			<div class="thumbnail" :class="classObject"> <img src="onepiece_vol1_cover.jpg" class="thumbnail__image"/>
+		<v-card elevation="1">
+			<div class="thumbnail" :class="classObject">
+				<router-link to="comics/1/pages/1">
+					<img src="onepiece_vol1_cover.jpg" class="thumbnail__image"/>
+				</router-link>
 			</div>
 			<v-card-text>
 				<div class="d-flex align-center justify-space-between">

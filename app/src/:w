@@ -1,0 +1,45 @@
+<template>
+	<div class="zoom-control">
+		<div>
+			<v-btn
+			>
+				-
+			</v-btn>
+		</div>
+		<div>
+			<v-text-field
+				hide-details
+				single-line
+				solo-inverted
+				class="zoom-control__level"
+				placeholder="0"/>
+		</div>
+	</div>
+</template>
+
+<script>
+	export default {
+			name: 'ZoomControl',
+			props: {
+			}
+		};
+</script>
+
+<style>
+	.zoom-control div + div {
+		margin-left: 8px;
+	}
+
+	.zoom-control__level {
+		flex: 0;
+	}
+
+	.zoom-control__level .v-input__control {
+		min-height: 0 !important;
+	}
+
+	.zoom-control__level input {
+		max-width: 32px;
+		text-align: center;
+	}
+</style>

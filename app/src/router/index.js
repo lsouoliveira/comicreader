@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import AddComics from '../views/AddComics.vue'
+import ReadComic from '../views/ReadComic.vue'
 
 Vue.use(VueRouter)
 
@@ -15,6 +16,11 @@ const routes = [
 		path: '/comics/add',
 		name: 'AddComics',
 		component: AddComics
+	},
+	{
+		path: '/comics/:id/pages/:page',
+		name: 'ReadComic',
+		component: ReadComic
 	}
 ]
 

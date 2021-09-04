@@ -9,7 +9,7 @@
 					justify="center"
 				>
 					<v-col md="7" lg="4">
-						<v-card>
+						<v-card elevation="1">
 							<v-card-title>Add Comics</v-card-title>
 							<v-divider />
 							<v-card-text>

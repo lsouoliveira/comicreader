@@ -17,10 +17,22 @@
 	};
 </script>
 
-<style>
-	.library {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
-		gap: 16px;
+<style lang="scss">
+	@import '~vuetify/src/components/VStepper/_variables.scss';
+
+	@media #{map-get($display-breakpoints, 'sm-and-down')} {
+		.library {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+			gap: 16px;
+		}
+	}
+
+	@media #{map-get($display-breakpoints, 'sm-and-up')} {
+		.library {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(164px, 1fr));
+			gap: 16px;
+		}
 	}
 </style>

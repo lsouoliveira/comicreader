@@ -12,8 +12,8 @@ export default new Vuetify({
 		},
 		themes: {
 			light: {
-				primary: colors.teal,
-				secondary: colors.indigo,
+				primary: colors.indigo,
+				secondary: colors.pink,
 				primaryText: colors.teal
 			}
 		}

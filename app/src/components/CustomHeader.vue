@@ -8,6 +8,12 @@
 <script>
 	export default {
 			name: 'CustomHeader',
+			props: {
+				logo: {
+					type: Boolean,
+					default: false
+				}
+			},
 			components: {
 			}
 		};
