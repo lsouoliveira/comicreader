@@ -1,6 +1,6 @@
 <template>
 	<v-app>
-		<v-app-bar app dark color="primary" >
+		<v-app-bar app dark color="primary" v-if="isControlsEnabled">
 			<v-toolbar-title class="title">Vol 1 - Romance Dawn</v-toolbar-title>
 			<v-spacer/>
 				<v-menu offset-y>
@@ -30,7 +30,10 @@
 				</v-menu>
 		</v-app-bar>
 		<v-main>
-			<comic-reader/>
+			<comic-reader
+				@click="handleComicReaderClick"
+				@dblclick="handleComicReaderDoubleClick"
+			/>
 		</v-main>
 		<v-app-bar
 			fixed
@@ -39,6 +42,7 @@
 			bottom
 			dense
 			width="100%"
+			v-if="isControlsEnabled"
 			>
 			<div class="options">
 				<page-counter />
@@ -61,7 +65,19 @@
 					ZoomControl,
 					ComicReader
 					// Loading
+			},
+			data() {
+				return {
+					isControlsEnabled: true
+				};
+			},
+			methods: {
+				handleComicReaderClick() {
+					this.isControlsEnabled = !this.isControlsEnabled;
+				},
+				handleComicReaderDoubleClick() {
 				}
+			}
 		}
 </script>
 

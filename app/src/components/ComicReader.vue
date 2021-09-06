@@ -2,16 +2,18 @@
 	<div class="comic">
 		<div>
 			<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" />
-			<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" />
-			<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" />
-			<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" />
-			<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" />
+				<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" />
+					<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" />
+						<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" />
+							<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" />
 		</div>
 	</div>
 </template>
 
 <script>
 	import ComicPage from './../components/ComicPage.vue'
+	import MouseScrollDrag from './../utils/MouseScrollDrag.js'
+	import MouseEvents from './../utils/MouseEvents.js'
 
 	export default {
 			name: 'ComicReader',
@@ -19,47 +21,23 @@
 				},
 			data() {
 					return {
-							isDragging: false,
-							lastMousePosition: {
-									x: 0,
-									y: 0
-							}
+							mouseScrollDrag: null,
+							mouseEvents: null
 						}
 				},
 			mounted() {
 					const rootElement = this.$el;
 
-					rootElement.addEventListener("mousedown", (e) => {
-							this.isDragging = true;
+					this.mouseScrollDrag = new MouseScrollDrag(rootElement);
+					this.mouseEvents = new MouseEvents(rootElement);
 
-							this.lastMousePosition = {
-									x: e.clientX,
-									y: e.clientY
-								};
-						}, false);
+					this.mouseEvents.onClick = () => {
+						this.$emit('click');
+					}
 
-					rootElement.addEventListener("mousemove", (e) => {
-							if(this.isDragging) {
-									const currentMousePosition = {
-											x: e.clientX,
-											y: e.clientY
-									};
-									window.scrollBy(
-										this.lastMousePosition.x - currentMousePosition.x,
-										this.lastMousePosition.y - currentMousePosition.y 
-									);
-
-									this.lastMousePosition = currentMousePosition;
-							}
-						}, false);
-
-					rootElement.addEventListener("mouseup", () => {
-							this.isDragging = false;
-					}, false);
-
-					rootElement.addEventListener("mouseleave", () => {
-							this.isDragging = false;
-					}, false);
+					this.mouseEvents.onDoubleClick = () => {
+						this.$emit('dblclick');
+					}
 				},
 
 			components: {
@@ -69,7 +47,6 @@
 </script>
 
 <style scoped>
-
 .comic {
 	position: relative;
 	min-height: 100vh;
