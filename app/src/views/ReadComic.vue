@@ -30,25 +30,27 @@
 				</v-menu>
 		</v-app-bar>
 		<v-main>
-			<v-toolbar
-				absolute
-				color="primary"
-				dark
-				bottom
-				dense
-				width="100%"
-				>
-				<div class="options">
-					<page-counter />
-				</div>
-			</v-toolbar>
+			<comic-reader/>
 		</v-main>
+		<v-app-bar
+			fixed
+			color="primary"
+			dark
+			bottom
+			dense
+			width="100%"
+			>
+			<div class="options">
+				<page-counter />
+			</div>
+		</v-app-bar>
 	</v-app>
 </template>
 
 <script>
 	import PageCounter from './../components/PageCounter.vue'
 	import ZoomControl from './../components/ZoomControl.vue'
+	import ComicReader from './../components/ComicReader.vue'
 	// import Loading from './../components/Loading.vue'
 
 	export default {
@@ -56,7 +58,8 @@
 			name: 'ReadComic',
 			components: {
 					PageCounter,
-					ZoomControl
+					ZoomControl,
+					ComicReader
 					// Loading
 				}
 		}
