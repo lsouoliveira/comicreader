@@ -4,6 +4,8 @@
 			min="25"
 			max="200"
 			step="25"
+			:value="zoomScale"
+			@change="handleChange"
 			thumb-label
 			ticks
 			></v-slider>
@@ -14,7 +16,16 @@
 	export default {
 			name: 'ZoomControl',
 			props: {
+				zoomScale: {
+					type: Number,
+					default: 100
 				}
+			},
+			methods: {
+				handleChange(value) {
+					this.$emit('change', value)
+				}
+			}
 		};
 </script>
 

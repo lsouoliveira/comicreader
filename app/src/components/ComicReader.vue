@@ -1,12 +1,10 @@
 <template>
-	<div class="comic">
-		<div>
-			<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" />
-				<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" />
-					<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" />
-						<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" />
-							<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" />
-		</div>
+	<div class="comic" :style="bottomMargin">
+			<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" :display-mode="displayMode" :zoom-scale="zoomScale"/>
+			<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" :display-mode="displayMode" :zoom-scale="zoomScale"/>
+			<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" :display-mode="displayMode" :zoom-scale="zoomScale"/>
+			<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" :display-mode="displayMode" :zoom-scale="zoomScale"/>
+			<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" :display-mode="displayMode" :zoom-scale="zoomScale"/>
 	</div>
 </template>
 
@@ -18,13 +16,31 @@
 	export default {
 			name: 'ComicReader',
 			props: {
+				displayMode: {
+					type: String
 				},
+				zoomScale: {
+					type: Number,
+					default: 1
+				},
+				bottomSpacing: {
+					type: Boolean,
+					default: true
+				}
+			},
 			data() {
 					return {
 							mouseScrollDrag: null,
 							mouseEvents: null
 						}
 				},
+			computed: {
+				bottomMargin() {
+					return {
+						paddingBottom: (8 + (this.bottomSpacing ? 48 : 0)) + 'px' 
+					}
+				}
+			},
 			mounted() {
 					const rootElement = this.$el;
 
@@ -39,7 +55,6 @@
 						this.$emit('dblclick');
 					}
 				},
-
 			components: {
 					ComicPage
 				}
@@ -51,7 +66,8 @@
 	position: relative;
 	min-height: 100vh;
 	background-color: #212121;
-	padding: 8px 0 56px 0;
+	padding-top: 8px;
+	padding-left: 8px;
 }
 
 .comic {

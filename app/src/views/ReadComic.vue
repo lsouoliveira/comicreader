@@ -14,26 +14,31 @@
 						</v-btn>
 					</template>
 					<v-list>
-						<v-list-item link>
+						<v-list-item link @click="setDisplayMode('fit-height')">
 							Adjust to height
 						</v-list-item>
-						<v-list-item link>
+						<v-list-item link @click="setDisplayMode('fit-width')">
 							Adjust to width
 						</v-list-item>
 						<v-list-item>
 							<div class="config__item">
 								<span>Zoom</span>
-								<zoom-control/>
+								<zoom-control :zoom-scale="zoomScale" @change="handleZoomControlChange"/>
 							</div>
 						</v-list-item>
 					</v-list>
 				</v-menu>
 		</v-app-bar>
 		<v-main>
-			<comic-reader
-				@click="handleComicReaderClick"
-				@dblclick="handleComicReaderDoubleClick"
-			/>
+			<div :class="mainWrapperClassObject">
+				<comic-reader
+					@click="handleComicReaderClick"
+					@dblclick="handleComicReaderDoubleClick"
+					:display-mode="displayMode"
+					:zoom-scale="normalizedZoomScale"
+					:bottom-spacing="isControlsEnabled"
+					/>
+			</div>
 		</v-main>
 		<v-app-bar
 			fixed
@@ -65,19 +70,38 @@
 					ZoomControl,
 					ComicReader
 					// Loading
-			},
-			data() {
-				return {
-					isControlsEnabled: true
-				};
-			},
-			methods: {
-				handleComicReaderClick() {
-					this.isControlsEnabled = !this.isControlsEnabled;
 				},
-				handleComicReaderDoubleClick() {
+			data() {
+					return {
+							isControlsEnabled: true,
+							displayMode: '',
+							zoomScale: 100
+						};
+				},
+			methods: {
+					handleComicReaderClick() {
+							this.isControlsEnabled = !this.isControlsEnabled;
+						},
+					handleComicReaderDoubleClick() {
+						},
+					setDisplayMode(displayMode) {
+							this.displayMode = displayMode;
+						},
+					handleZoomControlChange(value) {
+							this.zoomScale = value;
+							this.displayMode = "zoom";
+						}
+				},
+			computed: {
+					normalizedZoomScale() {
+							return this.zoomScale / 100;
+					},
+					mainWrapperClassObject() {
+							return {
+									"main-wrapper--padding-bottom": this.isControlsEnabled
+							}
+					}
 				}
-			}
 		}
 </script>
 
@@ -97,4 +121,5 @@
 .options * {
 	pointer-events: auto;
 }
+
 </style>
