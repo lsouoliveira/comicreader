@@ -5,7 +5,7 @@
 			hide-details
 			single-line
 			solo-inverted
-			:model="page"
+			:value="page"
 			class="page-counter__page"
 			placeholder="0"/>
 		</div>

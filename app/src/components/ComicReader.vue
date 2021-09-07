@@ -16,6 +16,18 @@
 	export default {
 			name: 'ComicReader',
 			props: {
+				page: {
+					type: Number,
+					default: 0
+				},
+				numPages: {
+					type: Number,
+					default: 0
+				},
+				numPreloadedImages: {
+					type: Number,
+					default: 0
+				},
 				displayMode: {
 					type: String
 				},

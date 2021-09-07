@@ -37,6 +37,9 @@
 					:display-mode="displayMode"
 					:zoom-scale="normalizedZoomScale"
 					:bottom-spacing="isControlsEnabled"
+					:page="page"
+					:num-pages="numPages"
+					:num-preloaded-images="numPreloadedImages"
 					/>
 			</div>
 		</v-main>
@@ -50,7 +53,7 @@
 			v-if="isControlsEnabled"
 			>
 			<div class="options">
-				<page-counter />
+				<page-counter :page="page" :max-pages="numPages" />
 			</div>
 		</v-app-bar>
 	</v-app>
@@ -61,6 +64,14 @@
 	import ZoomControl from './../components/ZoomControl.vue'
 	import ComicReader from './../components/ComicReader.vue'
 	// import Loading from './../components/Loading.vue'
+
+	const pages = [
+		"http://localhost:8080/onepiece_vol1_cover.jpg",
+		"http://localhost:8080/onepiece_vol1_cover.jpg",
+		"http://localhost:8080/onepiece_vol1_cover.jpg",
+		"http://localhost:8080/onepiece_vol1_cover.jpg",
+		"http://localhost:8080/onepiece_vol1_cover.jpg"
+	];
 
 	export default {
 
@@ -75,22 +86,37 @@
 					return {
 							isControlsEnabled: true,
 							displayMode: '',
-							zoomScale: 100
+							zoomScale: 100,
+							page: 1,
+							numPages: 5,
+							numPreloadedImages: 5,
+							pages: [],
+							pagesLoadingAbove: [],
+							pagesLoadingBelow: []
 						};
 				},
 			methods: {
 					handleComicReaderClick() {
 							this.isControlsEnabled = !this.isControlsEnabled;
-						},
+					},
 					handleComicReaderDoubleClick() {
-						},
+					},
 					setDisplayMode(displayMode) {
 							this.displayMode = displayMode;
-						},
+					},
 					handleZoomControlChange(value) {
 							this.zoomScale = value;
 							this.displayMode = "zoom";
+					},
+					loadPages(pageIndex) {
+						/*
+						{
+							index: 0,
+							url: "",
+							isVisible: false
 						}
+						*/
+					}
 				},
 			computed: {
 					normalizedZoomScale() {
@@ -101,7 +127,10 @@
 									"main-wrapper--padding-bottom": this.isControlsEnabled
 							}
 					}
-				}
+			},
+			mounted() {
+				loadPages(1, 5);
+			}
 		}
 </script>
 
