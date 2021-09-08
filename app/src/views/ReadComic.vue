@@ -39,9 +39,12 @@
 					:bottom-spacing="isControlsEnabled"
 					:page="page"
 					:num-pages="numPages"
-					:num-preloaded-images="numPreloadedImages"
+					:remain-images-trigger="remainImagesTrigger"
+					:pages="pages"
+					@page-load="handlePageLoaded"
 					/>
 			</div>
+			<loading :show="isLoadingComic" />
 		</v-main>
 		<v-app-bar
 			fixed
@@ -63,15 +66,15 @@
 	import PageCounter from './../components/PageCounter.vue'
 	import ZoomControl from './../components/ZoomControl.vue'
 	import ComicReader from './../components/ComicReader.vue'
-	// import Loading from './../components/Loading.vue'
+	import Loading from './../components/Loading.vue'
 
 	const pages = [
-		"http://localhost:8080/onepiece_vol1_cover.jpg",
-		"http://localhost:8080/onepiece_vol1_cover.jpg",
-		"http://localhost:8080/onepiece_vol1_cover.jpg",
-		"http://localhost:8080/onepiece_vol1_cover.jpg",
-		"http://localhost:8080/onepiece_vol1_cover.jpg"
-	];
+			"http://localhost:8080/onepiece_vol1_cover.jpg",
+			"http://localhost:8080/onepiece_vol1_cover.jpg",
+			"http://localhost:8080/onepiece_vol1_cover.jpg",
+			"http://localhost:8080/onepiece_vol1_cover.jpg",
+			"http://localhost:8080/onepiece_vol1_cover.jpg"
+		];
 
 	export default {
 
@@ -79,8 +82,8 @@
 			components: {
 					PageCounter,
 					ZoomControl,
-					ComicReader
-					// Loading
+					ComicReader,
+					Loading
 				},
 			data() {
 					return {
@@ -89,48 +92,132 @@
 							zoomScale: 100,
 							page: 1,
 							numPages: 5,
+							remainImagesTrigger: 5,
 							numPreloadedImages: 5,
 							pages: [],
-							pagesLoadingAbove: [],
-							pagesLoadingBelow: []
+							pagesLoadingBefore: [],
+							pagesLoadingAfter: [],
+							pagesLoadedBefore: [],
+							pagesLoadedAfter: [],
+							isLoadingImagesBefore: false,
+							isLoadingImagesAfter: false
 						};
 				},
 			methods: {
 					handleComicReaderClick() {
 							this.isControlsEnabled = !this.isControlsEnabled;
-					},
+						},
 					handleComicReaderDoubleClick() {
-					},
+						},
 					setDisplayMode(displayMode) {
 							this.displayMode = displayMode;
-					},
+						},
 					handleZoomControlChange(value) {
 							this.zoomScale = value;
 							this.displayMode = "zoom";
-					},
+						},
+					onImagesAfterLoaded() {
+							this.pagesLoadedAfter.forEach(page => page.isVisible = true);
+							this.isLoadingImagesBefore = false;
+						},
+					onImagesBeforeLoaded() {
+							this.isLoadingImagesBefore = false;
+							this.pagesLoadedBefore.forEach(page => page.isVisible = true);
+						},
+					handlePageLoaded(pageIndex) {
+							const page = this.pages.find(page => page.index == pageIndex);
+
+							if(!page) return;
+
+							if(page.isBefore) {
+								this.pagesLoadingBefore = this.pagesLoadingBefore.filter(page => page.index != pageIndex);
+								this.pagesLoadedBefore.push(page);
+
+								if(!this.pagesLoadingBefore.length) {
+										this.onImagesBeforeLoaded();
+								}
+							} else {
+								this.pagesLoadingAfter = this.pagesLoadingAfter.filter(page => page.index != pageIndex);
+								this.pagesLoadedAfter.push(page);
+
+								if(!this.pagesLoadingAfter.length) {
+										this.onImagesAfterLoaded();
+								}
+							}
+						},
 					loadPages(pageIndex) {
-						/*
-						{
-							index: 0,
-							url: "",
-							isVisible: false
+							this.isLoadingImagesBefore = this.isLoadingImagesAfter = true;
+
+							const startPage = Math.max(pageIndex - this.numPreloadedImages, 1);
+							const endPage = Math.min(pageIndex + this.numPreloadedImages, this.numPages);
+
+							this.pages.forEach(page => page.isVisible = false);
+
+							for(let i = startPage; i <= endPage; i++) {
+									let page = this.pages.find(page => page.index == i);
+
+									if(page) {
+
+											if(page.index >= pageIndex) {
+													this.pagesLoadedAfter.push(page);
+												} else {
+														this.pagesLoadedBefore.push(page);
+													}
+										} else {
+												const newPage = {
+														index: i,
+														url: pages[i - 1],
+														isVisible: false
+													};
+
+												let minIndex = 0;
+												for(let j = 0; j < this.pages.length; j++) {
+														if(this.pages[j].index + 1 > i) {
+																break;
+															}
+
+														minIndex = j;
+													}
+
+												this.pages.splice(minIndex + 1, 0, newPage);
+
+												page = newPage;
+
+												if(page.index >= pageIndex) {
+														this.pagesLoadingAfter.push(page);
+													} else {
+															this.pagesLoadingBefore.push(page);
+														}
+											}
+
+									page.isBefore = i < pageIndex;
+								}
+
+							if(!this.pagesLoadingAfter.length) {
+									this.onImagesAfterLoaded();
+								}
+
+							if(!this.pagesLoadingBefore.length) {
+									this.onImagesBeforeLoaded();
+								}
 						}
-						*/
-					}
 				},
 			computed: {
 					normalizedZoomScale() {
 							return this.zoomScale / 100;
-					},
+						},
 					mainWrapperClassObject() {
 							return {
 									"main-wrapper--padding-bottom": this.isControlsEnabled
-							}
-					}
-			},
+								}
+						},
+					isLoadingComic() {
+							return this.isLoadingImagesBefore && this.isLoadingImagesAfter;
+						}
+				},
 			mounted() {
-				loadPages(1, 5);
-			}
+					this.loadPages(1);
+				}
 		}
 </script>
 

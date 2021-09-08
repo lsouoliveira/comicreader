@@ -24,6 +24,10 @@
 					zoomScale: {
 						type: Number,
 						default: 1
+					},
+					index: {
+						type: Number,
+						default: 1
 					}
 			},
 			data() {
@@ -41,6 +45,8 @@
 					this.height = target.height;
 
 					this.isLoaded = true;
+
+					this.$emit('load', this.index);
 				}
 			},
 			computed: {

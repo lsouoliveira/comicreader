@@ -1,10 +1,15 @@
 <template>
 	<div class="comic" :style="bottomMargin">
-			<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" :display-mode="displayMode" :zoom-scale="zoomScale"/>
-			<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" :display-mode="displayMode" :zoom-scale="zoomScale"/>
-			<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" :display-mode="displayMode" :zoom-scale="zoomScale"/>
-			<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" :display-mode="displayMode" :zoom-scale="zoomScale"/>
-			<comic-page src="http://localhost:8080/onepiece_vol1_cover.jpg" :display-mode="displayMode" :zoom-scale="zoomScale"/>
+			<comic-page
+				:src="page.url"
+				:display-mode="displayMode"
+				:zoom-scale="zoomScale"
+				v-for="page in pages"
+				:index="page.index"
+				:key="page.index"
+				@load="handleImageLoaded"
+				:show="page.isVisible"
+			/>
 	</div>
 </template>
 
@@ -16,6 +21,7 @@
 	export default {
 			name: 'ComicReader',
 			props: {
+				pages: [],
 				page: {
 					type: Number,
 					default: 0
@@ -24,7 +30,7 @@
 					type: Number,
 					default: 0
 				},
-				numPreloadedImages: {
+				remainImagesTrigger: {
 					type: Number,
 					default: 0
 				},
@@ -51,6 +57,11 @@
 					return {
 						paddingBottom: (8 + (this.bottomSpacing ? 48 : 0)) + 'px' 
 					}
+				}
+			},
+			methods: {
+				handleImageLoaded(pageIndex) {
+					this.$emit('page-load', pageIndex);
 				}
 			},
 			mounted() {

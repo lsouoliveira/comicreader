@@ -1,8 +1,6 @@
 <template>
 	<div class="library">
-		<div v-for="n in 12" :key="n">
-			<library-item :isAvailable="true" @click="() => handleLibraryItemClick(n)" />
-		</div>
+		<library-item :isAvailable="true" @click="() => handleLibraryItemClick(n)" v-for="n in 12" :key="n"/>
 	</div>
 </template>
 
