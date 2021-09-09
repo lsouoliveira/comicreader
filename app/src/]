@@ -64,15 +64,7 @@ export default {
 			this.$emit('page-load', pageImage);
 		},
 		calculatePageHeight(pageHeight) {
-			switch(this.displayMode) {
-				case "fit-height":
-					return window.innerHeight;
-				case "fit-width":
-					return window.innerWidth;
-				case "zoom":
-					return this.zoomScale * pageHeight;
-			}
-
+			if(this.displayMode == '
 			return pageHeight;
 		},
 		getCurrentPage(scrollY) {
@@ -80,13 +72,12 @@ export default {
 
 			for(let i = 0; i < this.pages.length; i++) {
 				const page = this.pages[i];
-				const pageHeight = this.calculatePageHeight(page.height);
 
-				if(scrollY <= comicHeight + (pageHeight + 8) / 2) {
+				if(scrollY <= comicHeight + (this.calculatePageHeight(page.height) + 8) / 2) {
 					return page.index;
 				}
 
-				comicHeight += pageHeight + 8;
+				comicHeight += page.height + 8;
 			}
 
 			return this.numPages;

@@ -46,7 +46,11 @@
 
 					this.isLoaded = true;
 
-					this.$emit('load', this.index);
+					this.$emit('load', {
+						pageIndex: this.index,
+						width: this.width,
+						height: this.height
+					});
 				}
 			},
 			computed: {
