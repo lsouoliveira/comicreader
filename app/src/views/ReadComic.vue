@@ -41,8 +41,11 @@
 					:num-pages="numPages"
 					:remain-images-trigger="remainImagesTrigger"
 					:pages="pages"
+					:is-loading-images-before="isLoadingImagesBefore"
+					:is-loading-images-after="isLoadingImagesAfter"
 					@page-load="handlePageLoaded"
 					@page-change="handleComicReaderPageChange"
+					@load-more="handleComicReaderLoadMore"
 				/>
 			</div>
 			<loading :show="isLoadingComic" />
@@ -69,16 +72,7 @@ import ZoomControl from './../components/ZoomControl.vue'
 import ComicReader from './../components/ComicReader.vue'
 import Loading from './../components/Loading.vue'
 
-const pages = [
-	"http://localhost:8080/onepiece_vol1_cover.jpg",
-	"http://localhost:8080/onepiece_vol1_cover.jpg",
-	"http://localhost:8080/onepiece_vol1_cover.jpg",
-	"http://localhost:8080/onepiece_vol1_cover.jpg",
-	"http://localhost:8080/onepiece_vol1_cover.jpg"
-];
-
 export default {
-
 	name: 'ReadComic',
 	components: {
 		PageCounter,
@@ -92,7 +86,7 @@ export default {
 			displayMode: '',
 			zoomScale: 100,
 			page: 1,
-			numPages: 5,
+			numPages: 20,
 			remainImagesTrigger: 5,
 			numPreloadedImages: 5,
 			pages: [],
@@ -109,6 +103,72 @@ export default {
 		handleComicReaderPageChange(newPage) {
 			this.page = newPage;
 		},
+		handleComicReaderLoadMore(loadAfter) {
+			const visiblePages = this.pages.filter(page => page.isVisible);
+
+			if(this.isLoadingComic) return;
+			if(!visiblePages.length) return;
+			if(loadAfter && this.isLoadingImagesAfter) return;
+			if(!loadAfter && this.isLoadingImagesBefore) return;
+
+			if(loadAfter && visiblePages[visiblePages.length - 1].index < this.numPages) {
+				this.isLoadingImagesAfter = true;
+				this.loadMore(visiblePages[visiblePages.length - 1].index + 1, visiblePages[visiblePages.length - 1].index + this.numPreloadedImages, false);
+			}
+
+			if(!loadAfter && visiblePages[0].index > 1) {
+				this.isLoadingImagesBefore = true;
+				this.loadMore(visiblePages[0].index - 1, visiblePages[0].index - this.numPreloadedImages, true);
+			}
+		},
+		loadMore(startPageIndex, endPageIndex, isBefore) {
+			for(let i = startPageIndex; i <= endPageIndex; i++) {
+				let page = this.pages.find(page => page.index == i);
+
+				if(!page) {
+					const newPage = {
+						index: i,
+						url: "https://picsum.photos/333/500",
+						isVisible: false,
+						isLoaded: false,
+						isBefore: isBefore
+					};
+
+					let minIndex = 0;
+					for(let j = 0; j < this.pages.length; j++) {
+						if(this.pages[j].index + 1 > i) {
+							break;
+						}
+
+						minIndex = j;
+					}
+
+					page = newPage;
+
+					this.pages.splice(minIndex + 1, 0, newPage);
+
+					if(isBefore) {
+						this.pagesLoadingBefore.push(page);
+					} else {
+						this.pagesLoadingAfter.push(page);
+					}
+				}
+
+				if(isBefore) {
+					this.pagesLoadedBefore.push(page);
+				} else {
+					this.pagesLoadedAfter.push(page);
+				}
+			}
+
+			if(isBefore && !this.pagesLoadingBefore.length) {
+				this.onImagesBeforeLoaded();
+			}
+
+			if(!isBefore && !this.pagesLoadingAfter.length) {
+				this.onImagesAfterLoaded();
+			}
+		},
 		handleComicReaderClick() {
 			this.isControlsEnabled = !this.isControlsEnabled;
 		},
@@ -123,13 +183,14 @@ export default {
 		},
 		onImagesAfterLoaded() {
 			this.pagesLoadedAfter.forEach(page => page.isVisible = true);
+			this.pagesLoadedAfter = [];
 			this.isLoadingImagesAfter = false;
-
 			this.isLoadingComic = this.isLoadingImagesBefore;
 		},
 		onImagesBeforeLoaded() {
-			this.isLoadingImagesBefore = false;
 			this.pagesLoadedBefore.forEach(page => page.isVisible = true);
+			this.isLoadingImagesBefore = [];
+			this.isLoadingImagesBefore = false;
 			this.isLoadingComic = this.isLoadingImagesAfter;
 		},
 		handlePageLoaded(pageImage) {
@@ -141,6 +202,7 @@ export default {
 
 			page.width = width;
 			page.height = height;
+			page.isLoaded = true;
 
 			if(page.isBefore) {
 				this.pagesLoadingBefore = this.pagesLoadingBefore.filter(page => page.index != pageIndex);
@@ -163,7 +225,7 @@ export default {
 			this.isLoadingImagesBefore = this.isLoadingImagesAfter = true;
 
 			const startPage = Math.max(pageIndex - this.numPreloadedImages, 1);
-			const endPage = Math.min(pageIndex + this.numPreloadedImages, this.numPages);
+			const endPage = Math.min(pageIndex + this.numPreloadedImages, 5);
 
 			this.pages.forEach(page => page.isVisible = false);
 
@@ -180,8 +242,9 @@ export default {
 				} else {
 					const newPage = {
 						index: i,
-						url: pages[i - 1],
-						isVisible: false
+						url: "https://picsum.photos/333/500",
+						isVisible: false,
+						isLoaded: false
 					};
 
 					let minIndex = 0;

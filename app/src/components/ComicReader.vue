@@ -1,5 +1,6 @@
 <template>
 	<div class="comic" :style="bottomMargin">
+		<custom-loading :show="isLoadingImagesBefore"/>
 		<comic-page
 			:src="page.url"
 			:display-mode="displayMode"
@@ -10,11 +11,13 @@
 			@load="handleImageLoaded"
 			:show="page.isVisible"
 		/>
+		<custom-loading :show="isLoadingImagesAfter"/>
 	</div>
 </template>
 
 <script>
 import ComicPage from './../components/ComicPage.vue'
+import CustomLoading from './../components/CustomLoading.vue'
 import MouseScrollDrag from './../utils/MouseScrollDrag.js'
 import MouseEvents from './../utils/MouseEvents.js'
 
@@ -44,6 +47,14 @@ export default {
 		bottomSpacing: {
 			type: Boolean,
 			default: true
+		},
+		isLoadingImagesBefore: {
+			type: Boolean,
+			default: false
+		},
+		isLoadingImagesAfter: {
+			type: Boolean,
+			default: false
 		}
 	},
 	data() {
@@ -107,6 +118,20 @@ export default {
 		},
 		onPageChange(newPage) {
 			this.$emit("page-change", newPage);
+
+			const visiblePages = this.pages.filter(page => page.isVisible);
+
+			if(visiblePages.length && visiblePages.length < this.numPages) {
+				if(newPage + this.remainImagesTrigger >= visiblePages[visiblePages.length - 1].index &&
+					visiblePages[visiblePages.length - 1].index < this.numPages) {
+					this.$emit("load-more", true);
+				}
+
+				if(newPage - this.remainImagesTrigger <= visiblePages[0].index && 
+					visiblePages[0].index > 1) {
+					this.$emit("load-more", false);
+				}
+			}
 		}
 	},
 	mounted() {
@@ -128,7 +153,8 @@ export default {
 		});
 	},
 	components: {
-		ComicPage
+		ComicPage,
+		CustomLoading
 	}
 };
 </script>
