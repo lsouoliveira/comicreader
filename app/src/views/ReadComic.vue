@@ -39,7 +39,7 @@
 					:bottom-spacing="isControlsEnabled"
 					:page="page"
 					:num-pages="numPages"
-					:remain-images-trigger="remainImagesTrigger"
+					:remain-images-to-trigger="remainImagesToTrigger"
 					:pages="pages"
 					:is-loading-images-before="isLoadingImagesBefore"
 					:is-loading-images-after="isLoadingImagesAfter"
@@ -87,7 +87,7 @@ export default {
 			zoomScale: 100,
 			page: 1,
 			numPages: 20,
-			remainImagesTrigger: 5,
+			remainImagesToTrigger: 5,
 			numPreloadedImages: 5,
 			pages: [],
 			pagesLoadingBefore: [],
@@ -105,20 +105,21 @@ export default {
 		},
 		handleComicReaderLoadMore(loadAfter) {
 			const visiblePages = this.pages.filter(page => page.isVisible);
+			const numVisiblePages = visiblePages.length;
+			const lastPageIndex = numVisiblePages && visiblePages[visiblePages.length - 1].index;
+			const firstPageIndex = numVisiblePages && visiblePages[0].index;
 
-			if(this.isLoadingComic) return;
-			if(!visiblePages.length) return;
-			if(loadAfter && this.isLoadingImagesAfter) return;
-			if(!loadAfter && this.isLoadingImagesBefore) return;
+			if(this.isLoadingComic ||
+				!visiblePages.length ||
+				loadAfter && this.isLoadingImagesAfter ||
+				!loadAfter && this.isLoadingImagesBefore) return;
 
-			if(loadAfter && visiblePages[visiblePages.length - 1].index < this.numPages) {
+			if(loadAfter && (numVisiblePages === 0 || lastPageIndex < this.numPages)) {
 				this.isLoadingImagesAfter = true;
-				this.loadMore(visiblePages[visiblePages.length - 1].index + 1, visiblePages[visiblePages.length - 1].index + this.numPreloadedImages, false);
-			}
-
-			if(!loadAfter && visiblePages[0].index > 1) {
+				this.loadMore(lastPageIndex + 1, lastPageIndex + this.numPreloadedImages, false);
+			} else if(numVisiblePages === 0 || firstPageIndex > 1) {
 				this.isLoadingImagesBefore = true;
-				this.loadMore(visiblePages[0].index - 1, visiblePages[0].index - this.numPreloadedImages, true);
+				this.loadMore(firstPageIndex - 1, firstPageIndex - this.numPreloadedImages, true);
 			}
 		},
 		loadMore(startPageIndex, endPageIndex, isBefore) {
@@ -134,18 +135,7 @@ export default {
 						isBefore: isBefore
 					};
 
-					let minIndex = 0;
-					for(let j = 0; j < this.pages.length; j++) {
-						if(this.pages[j].index + 1 > i) {
-							break;
-						}
-
-						minIndex = j;
-					}
-
-					page = newPage;
-
-					this.pages.splice(minIndex + 1, 0, newPage);
+					page = this.insertPage(newPage);
 
 					if(isBefore) {
 						this.pagesLoadingBefore.push(page);
@@ -168,6 +158,21 @@ export default {
 			if(!isBefore && !this.pagesLoadingAfter.length) {
 				this.onImagesAfterLoaded();
 			}
+		},
+		insertPage(page) {
+			let minIndex = 0;
+
+			for(let j = 0; j < this.pages.length; j++) {
+				if(this.pages[j].index + 1 > page.index) {
+					break;
+				}
+
+				minIndex = j;
+			}
+
+			this.pages.splice(minIndex + 1, 0, page);
+
+			return page;
 		},
 		handleComicReaderClick() {
 			this.isControlsEnabled = !this.isControlsEnabled;
@@ -247,18 +252,7 @@ export default {
 						isLoaded: false
 					};
 
-					let minIndex = 0;
-					for(let j = 0; j < this.pages.length; j++) {
-						if(this.pages[j].index + 1 > i) {
-							break;
-						}
-
-						minIndex = j;
-					}
-
-					this.pages.splice(minIndex + 1, 0, newPage);
-
-					page = newPage;
+					page = this.insertPage(newPage);
 
 					if(page.index >= pageIndex) {
 						this.pagesLoadingAfter.push(page);

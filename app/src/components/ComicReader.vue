@@ -21,6 +21,9 @@ import CustomLoading from './../components/CustomLoading.vue'
 import MouseScrollDrag from './../utils/MouseScrollDrag.js'
 import MouseEvents from './../utils/MouseEvents.js'
 
+const PAGE_MARGIN_TOP = 8;
+const BOTTOM_BAR_HEIGHT_PLUS_MARGIN = 48;
+
 export default {
 	name: 'ComicReader',
 	props: {
@@ -33,7 +36,7 @@ export default {
 			type: Number,
 			default: 0
 		},
-		remainImagesTrigger: {
+		remainImagesToTrigger: {
 			type: Number,
 			default: 0
 		},
@@ -65,8 +68,9 @@ export default {
 	},
 	computed: {
 		bottomMargin() {
+			const paddingBottom = this.bottomSpacing ? BOTTOM_BAR_HEIGHT_PLUS_MARGIN : 0;
 			return {
-				paddingBottom: (8 + (this.bottomSpacing ? 48 : 0)) + 'px' 
+				paddingBottom
 			}
 		}
 	},
@@ -86,31 +90,26 @@ export default {
 
 			return pageHeight;
 		},
-		getCurrentPage(scrollY) {
+		getCurrentPageByScrollPosition() {
+			const scrollY = Math.max(0, window.scrollY);
 			let comicHeight = 0;
 
 			for(let i = 0; i < this.pages.length; i++) {
 				const page = this.pages[i];
 				const pageHeight = this.calculatePageHeight(page.height);
+				const comicHalfPage = comicHeight + (pageHeight + PAGE_MARGIN_TOP) / 2;
 
-				if(scrollY <= comicHeight + (pageHeight + 8) / 2) {
+				if(scrollY <= comicHalfPage) {
 					return page.index;
 				}
 
-				comicHeight += pageHeight + 8;
+				comicHeight += pageHeight + PAGE_MARGIN_TOP;
 			}
 
 			return this.numPages;
 		},
 		handleScrollPositionChange() {
-			const scrollPosition = window.scrollY;
-			let scrollY = scrollPosition;
-
-			if(scrollY <= 0) {
-				scrollY = 0;
-			}
-
-			const currentPage = this.getCurrentPage(scrollY);
+			const currentPage = this.getCurrentPageByScrollPosition();
 
 			if(currentPage != this.page) {
 				this.onPageChange(currentPage);
@@ -119,16 +118,23 @@ export default {
 		onPageChange(newPage) {
 			this.$emit("page-change", newPage);
 
+			this.processPageChange(newPage);
+		},
+		processPageChange(newPage) {
 			const visiblePages = this.pages.filter(page => page.isVisible);
+			const numVisiblePages = visiblePages.length;
 
-			if(visiblePages.length && visiblePages.length < this.numPages) {
-				if(newPage + this.remainImagesTrigger >= visiblePages[visiblePages.length - 1].index &&
-					visiblePages[visiblePages.length - 1].index < this.numPages) {
+			if(numVisiblePages > 0 && numVisiblePages < this.numPages) {
+				const firstPageIndex = visiblePages[0].index;
+				const lastPageIndex = visiblePages[visiblePages.length - 1].index;
+				const loadAfterThreshold = newPage + this.remainImagesToTrigger;
+				const loadBeforeThreshold = newPage - this.remainImagesToTrigger;
+				
+				if(loadAfterThreshold >= lastPageIndex && lastPageIndex < this.numPages) {
 					this.$emit("load-more", true);
 				}
 
-				if(newPage - this.remainImagesTrigger <= visiblePages[0].index && 
-					visiblePages[0].index > 1) {
+				if(loadBeforeThreshold <= firstPageIndex && firstPageIndex  > 1) {
 					this.$emit("load-more", false);
 				}
 			}
