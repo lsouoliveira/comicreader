@@ -51,6 +51,10 @@ export default {
 			type: Boolean,
 			default: true
 		},
+		isLoadingComic: {
+			type: Boolean,
+			default: true
+		},
 		isLoadingImagesBefore: {
 			type: Boolean,
 			default: false
@@ -63,7 +67,9 @@ export default {
 	data() {
 		return {
 			mouseScrollDrag: null,
-			mouseEvents: null
+			mouseEvents: null,
+			isSetupDone: false,
+			isInfiniteScrollEnabled: false
 		}
 	},
 	computed: {
@@ -91,11 +97,12 @@ export default {
 			return pageHeight;
 		},
 		getCurrentPageByScrollPosition() {
+			const visiblePages = this.pages.filter(page => page.isVisible);
 			const scrollY = Math.max(0, window.scrollY);
 			let comicHeight = 0;
 
-			for(let i = 0; i < this.pages.length; i++) {
-				const page = this.pages[i];
+			for(let i = 0; i < visiblePages.length; i++) {
+				const page = visiblePages[i];
 				const pageHeight = this.calculatePageHeight(page.height);
 				const comicHalfPage = comicHeight + (pageHeight + PAGE_MARGIN_TOP) / 2;
 
@@ -106,9 +113,15 @@ export default {
 				comicHeight += pageHeight + PAGE_MARGIN_TOP;
 			}
 
-			return this.numPages;
+			if(visiblePages.length === 0) {
+				return 0;
+			}
+
+			return visiblePages[visiblePages.length - 1].index;
 		},
 		handleScrollPositionChange() {
+			if(!this.isInfiniteScrollEnabled) return;
+
 			const currentPage = this.getCurrentPageByScrollPosition();
 
 			if(currentPage != this.page) {
@@ -138,12 +151,48 @@ export default {
 					this.$emit("load-more", false);
 				}
 			}
+		},
+		handleComicLoaded() {
+			const currentPage = this.pages.find(page => page.index === this.page);
+
+			if(currentPage) {
+				const rootElementTop = this.$el.getBoundingClientRect().top + window.scrollY;
+				const imgTop = currentPage.img.getBoundingClientRect().top;
+				const elementScrollPos = imgTop + window.scrollY - rootElementTop - PAGE_MARGIN_TOP;
+
+				this.scrollTargetPosition = elementScrollPos;
+
+				setTimeout(() => {
+					window.scroll({
+						top: elementScrollPos,
+						behavior: 'auto'
+					})
+
+					this.onScrollStoppedMoving();
+				}, 250);
+			} else {
+				this.onScrollStoppedMoving();
+			}
+		},
+		onScrollStoppedMoving() {
+			this.onReady();
+		},
+		onReady() {
+			this.isInfiniteScrollEnabled = true;
+			this.mouseScrollDrag.setEnabled(true);
+			this.$emit("ready");
+		}
+	},
+	watch: {
+		isLoadingComic(val) {
+			if(!val) {
+				this.handleComicLoaded();
+			}
 		}
 	},
 	mounted() {
 		const rootElement = this.$el;
 
-		this.mouseScrollDrag = new MouseScrollDrag(rootElement);
 		this.mouseEvents = new MouseEvents(rootElement);
 
 		this.mouseEvents.onClick = () => {
@@ -153,6 +202,8 @@ export default {
 		this.mouseEvents.onDoubleClick = () => {
 			this.$emit('dblclick');
 		}
+
+		this.mouseScrollDrag = new MouseScrollDrag(rootElement);
 
 		document.addEventListener('scroll', () => {
 			this.handleScrollPositionChange();

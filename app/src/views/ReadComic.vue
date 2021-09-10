@@ -43,12 +43,14 @@
 					:pages="pages"
 					:is-loading-images-before="isLoadingImagesBefore"
 					:is-loading-images-after="isLoadingImagesAfter"
+					:is-loading-comic="isLoadingComic"
 					@page-load="handlePageLoaded"
 					@page-change="handleComicReaderPageChange"
 					@load-more="handleComicReaderLoadMore"
+					@ready="handleComicReaderReady"
 				/>
 			</div>
-			<loading :show="isLoadingComic" />
+			<loading :show="isLoadingComic && !isComicReaderReady" />
 		</v-main>
 		<v-app-bar
 			fixed
@@ -96,10 +98,14 @@ export default {
 			pagesLoadedAfter: [],
 			isLoadingImagesBefore: false,
 			isLoadingImagesAfter: false,
-			isLoadingComic: true
+			isLoadingComic: true,
+			isComicReaderReady: false
 		};
 	},
 	methods: {
+		handleComicReaderReady() {
+			this.isComicReaderReady = true;
+		},
 		handleComicReaderPageChange(newPage) {
 			this.page = newPage;
 		},
@@ -132,7 +138,8 @@ export default {
 						url: "https://picsum.photos/333/500",
 						isVisible: false,
 						isLoaded: false,
-						isBefore: isBefore
+						isBefore: isBefore,
+						img: null
 					};
 
 					page = this.insertPage(newPage);
@@ -208,6 +215,7 @@ export default {
 			page.width = width;
 			page.height = height;
 			page.isLoaded = true;
+			page.img = pageImage.img;
 
 			if(page.isBefore) {
 				this.pagesLoadingBefore = this.pagesLoadingBefore.filter(page => page.index != pageIndex);
@@ -249,7 +257,8 @@ export default {
 						index: i,
 						url: "https://picsum.photos/333/500",
 						isVisible: false,
-						isLoaded: false
+						isLoaded: false,
+						img: null
 					};
 
 					page = this.insertPage(newPage);

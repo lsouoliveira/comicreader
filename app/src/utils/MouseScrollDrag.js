@@ -1,4 +1,5 @@
 export default class MouseScrollDrag {
+	isEnabled = false
 	mouseDown = false
 	isDragging = false
 	lastMousePosition = {
@@ -24,7 +25,13 @@ export default class MouseScrollDrag {
 		}, false);
 	}
 
+	setEnabled(isEnabled) {
+		this.isEnabled = isEnabled;
+	}
+
 	handleMouseDown(e) {
+		if(!this.isEnabled) return;
+
 		this.isMouseDown = true;
 		this.lastMousePosition = {
 			x: e.clientX,
@@ -33,11 +40,13 @@ export default class MouseScrollDrag {
 	}
 
 	handleMouseUp() {
+		if(!this.isEnabled) return;
 		this.isMouseDown = false;
 		this.isDragging = false;
 	}
 
 	handleMouseMove(e) {
+		if(!this.isEnabled) return;
 		if(this.isMouseDown) {
 			this.isDragging = true;
 		}
@@ -58,6 +67,7 @@ export default class MouseScrollDrag {
 	}
 
 	handleMouseLeave() {
+		if(!this.isEnabled) return;
 		this.isDragging = false;
 		this.isMouseDown = false;
 	}

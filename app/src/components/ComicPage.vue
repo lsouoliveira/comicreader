@@ -5,6 +5,7 @@
 			:src="src"
 			@load="onImgLoad"
 			:style="styleObject"
+			ref="img"
 			/>
 	</div>
 </template>
@@ -49,7 +50,8 @@
 					this.$emit('load', {
 						pageIndex: this.index,
 						width: this.width,
-						height: this.height
+						height: this.height,
+						img: this.$refs.img 
 					});
 				}
 			},
