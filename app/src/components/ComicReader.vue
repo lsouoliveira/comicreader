@@ -43,9 +43,7 @@ export default {
 		displayMode: {
 			type: String
 		},
-		zoomScale: {
-			type: Number,
-			default: 1
+		zoomScale: { type: Number, default: 1
 		},
 		bottomSpacing: {
 			type: Boolean,

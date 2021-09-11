@@ -87,9 +87,9 @@ export default {
 			isControlsEnabled: true,
 			displayMode: '',
 			zoomScale: 100,
-			page: 1,
+			page: 10,
 			numPages: 20,
-			remainImagesToTrigger: 5,
+			remainImagesToTrigger: 3,
 			numPreloadedImages: 5,
 			pages: [],
 			pagesLoadingBefore: [],
@@ -120,16 +120,19 @@ export default {
 				loadAfter && this.isLoadingImagesAfter ||
 				!loadAfter && this.isLoadingImagesBefore) return;
 
-			if(loadAfter && (numVisiblePages === 0 || lastPageIndex < this.numPages)) {
+			if(loadAfter && lastPageIndex < this.numPages) {
 				this.isLoadingImagesAfter = true;
 				this.loadMore(lastPageIndex + 1, lastPageIndex + this.numPreloadedImages, false);
-			} else if(numVisiblePages === 0 || firstPageIndex > 1) {
+			} else if(firstPageIndex > 1) {
 				this.isLoadingImagesBefore = true;
-				this.loadMore(firstPageIndex - 1, firstPageIndex - this.numPreloadedImages, true);
+				this.loadMore(firstPageIndex - this.numPreloadedImages, firstPageIndex - 1, true);
 			}
 		},
 		loadMore(startPageIndex, endPageIndex, isBefore) {
-			for(let i = startPageIndex; i <= endPageIndex; i++) {
+			const start = Math.max(startPageIndex, 1);
+			const end = Math.min(endPageIndex, this.numPages);
+
+			for(let i = start; i <= end; i++) {
 				let page = this.pages.find(page => page.index == i);
 
 				if(!page) {
@@ -167,17 +170,14 @@ export default {
 			}
 		},
 		insertPage(page) {
-			let minIndex = 0;
-
-			for(let j = 0; j < this.pages.length; j++) {
-				if(this.pages[j].index + 1 > page.index) {
+			let j;
+			for(j = 0; j < this.pages.length; j++) {
+				if(this.pages[j].index > page.index) {
 					break;
 				}
-
-				minIndex = j;
 			}
 
-			this.pages.splice(minIndex + 1, 0, page);
+			this.pages.splice(j, 0, page);
 
 			return page;
 		},
@@ -235,10 +235,17 @@ export default {
 		},
 		loadPages(pageIndex) {
 			this.isLoadingComic = true;
-			this.isLoadingImagesBefore = this.isLoadingImagesAfter = true;
+
+			if(pageIndex > 1) {
+				this.isLoadingImagesBefore = true;
+			}
+
+			if(pageIndex < this.numPages) {
+				this.isLoadingImagesAfter = true;
+			}
 
 			const startPage = Math.max(pageIndex - this.numPreloadedImages, 1);
-			const endPage = Math.min(pageIndex + this.numPreloadedImages, 5);
+			const endPage = Math.min(pageIndex + this.numPreloadedImages, this.numPages);
 
 			this.pages.forEach(page => page.isVisible = false);
 
@@ -293,7 +300,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.loadPages(1);
+		this.loadPages(10);
 	}
 }
 </script>

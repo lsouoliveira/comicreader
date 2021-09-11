@@ -7,6 +7,8 @@
 			solo-inverted
 			:value="page"
 			class="page-counter__page"
+			@keydown="handleKeyDown"
+			@input="handleInput"
 			placeholder="0"/>
 		</div>
 		<div>
@@ -30,6 +32,28 @@
 							type: Number,
 							default: 0
 					}
+			},
+			data() {
+				return {
+					currentValue: {
+						type: Number,
+						default: this.page 
+					}
+				};
+			},
+			methods: {
+				handleInput(val) {
+					this.currentValue = val;
+				},
+				handleKeyDown(e) {
+					if(e.keyCode === 13 && this.page !== this.currentValue) {
+						this.onPageChange();
+					}
+				},
+				onPageChange() {
+					this.$emit('page-change', this.currentValue);
+					this.currentValue = this.page;
+				}
 			}
 		};
 </script>
