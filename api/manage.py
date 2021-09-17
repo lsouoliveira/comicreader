@@ -4,13 +4,13 @@ import unittest
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 
-from app import blueprint
+from app import api_blueprint
 from app.main import create_app, db
 from app.main.model import book, metadata, bookprocess, readingprogress 
 from app.main.errors import errors
 
 app = create_app(os.getenv('BOILERPLATE_ENV') or 'dev')
-app.register_blueprint(blueprint)
+app.register_blueprint(api_blueprint, url_prefix="/v1")
 app.register_blueprint(errors)
 
 app.app_context().push()

@@ -1,15 +1,15 @@
 from flask_restx import Api
 from flask import Blueprint
 
-from .main.controller.test_controller import api as test_ns
+from .main.controller.v1.book_controller import api as book_ns
 
-blueprint = Blueprint('api', __name__)
+api_blueprint = Blueprint('api', __name__)
 
 api = Api(
-    blueprint,
+    api_blueprint,
     title='COMIC READER API',
     version='1.0',
     description='Comic Reader API.'
 )
 
-api.add_namespace(test_ns, path="/")
+api.add_namespace(book_ns, path="/books")
