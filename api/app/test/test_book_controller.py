@@ -4,14 +4,13 @@ from app.main import db
 import json
 from app.test.base import BaseTestCase
 from app.main.model.book import Book, BookType
-from app.main.dto.book import BookDto
 
 def create_book():
     book = Book(
         cover_image = "image.jpg",
         file_id = "file_id",
         num_pages = 100,
-        book_type = BookType.comic,
+        book_type = BookType.comic
     )
     db.session.add(book)
     db.session.commit()
@@ -30,7 +29,6 @@ class TestBookController(BaseTestCase):
             self.assertTrue('data' in data)
             self.assertTrue('pagination' in data)
             self.assertEqual(len(data['data']), 1)
-            self.assertTrue(BookDto.get_book.validate(data['data'][0]))
             self.assertEqual(response.status_code, 200)
 
     def test_get_book_by_id(self):
@@ -43,20 +41,41 @@ class TestBookController(BaseTestCase):
 
             self.assertTrue('data' in data)
             self.assertEqual(data['data']['id'], book_created.id)
-            self.assertTrue(BookDto.get_book.validate(data['data']))
             self.assertEqual(response.status_code, 200)
 
-    def test_add_books(self):
-        self.assertTrue(False)
-
     def test_bookmark(self):
-        self.assertTrue(False)
+        with self.client:
+            book_created = create_book()
+
+            new_page = 2
+
+            response = self.client.put(
+                    '/v1/books/{}/bookmark'.format(book_created.id),
+                    data=json.dumps({'page': new_page}))
+
+            data = json.loads(response.data.decode())
+
+            self.assertEqual(data['data']['reading_progress']['page'], new_page)
 
     def test_mask_as_read(self):
-        self.assertTrue(False)
+        with self.client:
+            book_created = create_book()
 
-    def test_update_metadata(self):
-        self.assertTrue(False)
+            response = self.client.get('/v1/books/{}/mark-as-read'.format(book_created.id))
+
+            data = json.loads(response.data.decode())
+
+            self.assertTrue(data['data']['reading_progress']['read'], True)
+
+    def test_mark_as_unread(self):
+        with self.client:
+            book_created = create_book()
+
+            response = self.client.get('/v1/books/{}/mark-as-unread'.format(book_created.id))
+
+            data = json.loads(response.data.decode())
+
+            self.assertTrue(data['data']['reading_progress']['read'], False)
 
 if __name__ == '__main__':
     unittest.main()

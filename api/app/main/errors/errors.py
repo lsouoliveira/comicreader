@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify
+import traceback
 
 from ..exceptions.exceptions import InternalError, PageNotFoundError
 
@@ -18,5 +19,6 @@ def handle_page_not_found(error):
 
 @errors.app_errorhandler(Exception)
 def handle_unknown_error(error):
+    print(traceback.format_exc())
     return create_error_response(InternalError())
 

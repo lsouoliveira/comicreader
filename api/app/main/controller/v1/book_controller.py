@@ -2,15 +2,22 @@ from flask import request
 from flask_restx import Resource
 from flask_restx import Namespace
 from typing import Dict, Tuple
+from app.main import db
+from app.main.service.book_service import get_all_books
+from app.main.dto.book import BookDto
+from app.main import pagination
+from app.main.util.pagination import PaginationUtils
 
-api = Namespace('book')  
+api = BookDto.api
 
 @api.route('/')
 class BookList(Resource):
     @api.doc('list_of_books')
     def get(self):
         """List all books"""
-        return ''
+        return PaginationUtils.paginate(
+                get_all_books(),
+                BookDto.get_book)
 
     def post(self):
         return '' 
