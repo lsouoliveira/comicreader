@@ -19,10 +19,9 @@ class Book(db.Model):
     meta = db.relationship("Metadata")
     book_process = db.relationship("BookProcess", uselist=False)
     reading_progress = db.relationship("ReadingProgress", uselist=False)
-    created_at = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(
             db.DateTime,
-            nullable=False,
             server_default=db.func.now(),
             server_onupdate=db.func.now()
     )

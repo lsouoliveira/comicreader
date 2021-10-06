@@ -5,7 +5,6 @@ from typing import Dict, Tuple
 from app.main import db
 from app.main.service.book_service import get_all_books
 from app.main.dto.book import BookDto
-from app.main import pagination
 from app.main.util.pagination import PaginationUtils
 
 api = BookDto.api
