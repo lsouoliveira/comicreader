@@ -62,7 +62,14 @@ def seed():
             reading_progress = readingprogress.ReadingProgress(
                     page = fake.pyint(1, num_pages),
                     read = fake.pybool() 
-                )
+                ),
+            meta = [
+                    metadata.Metadata(
+                            key = "title",
+                            value = fake.sentence(nb_words=4),
+                            data_type = metadata.DataType.string
+                        )
+                ]
         )
         db.session.add(instance)
         db.session.commit()

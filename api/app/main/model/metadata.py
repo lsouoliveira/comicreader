@@ -5,7 +5,10 @@ from sqlalchemy.sql import func
 from sqlalchemy.dialects.postgresql import ENUM
 
 class DataType(Enum):
-    string = 1
+    string = "string"
+
+    def __str__(self):
+        return self.value
 
 class Metadata(db.Model):
     """ Metadata Model for storing book metadata """

@@ -4,9 +4,12 @@ from enum import Enum
 from sqlalchemy.dialects.postgresql import ENUM
 
 class ProcessStatus(Enum):
-    running = 1
-    finished = 2
-    error = 3
+    running = "running"
+    finished = "finished"
+    error = "error"
+
+    def __str__(self):
+        return self.value
 
 class BookProcess(db.Model):
     """ BookProcess Model for storing book process related details """
