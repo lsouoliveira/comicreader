@@ -1,6 +1,6 @@
 from flask_restx import Namespace, fields
 
-class Metadata:
+class MetadataDto:
     api = Namespace('metadata', description='book metadata')
 
     get_metadata = api.model('get_metadata', {

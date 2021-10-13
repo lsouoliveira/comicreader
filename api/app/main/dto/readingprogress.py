@@ -1,6 +1,6 @@
 from flask_restx import Namespace, fields
 
-class ReadingProgress:
+class ReadingProgressDto:
     api = Namespace('readingprogress', description='book reading progress')
 
     get_readingprogress = api.model('get_readingprogress', {

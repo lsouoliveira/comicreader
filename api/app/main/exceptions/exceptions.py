@@ -26,3 +26,11 @@ class InternalError(ApiError):
 class PageNotFoundError(ApiError):
     def __init__(self):
         super().__init__("Page not found", "The page requested was not found.", 1, 404)
+
+class ResourceNotFound(ApiError):
+    def __init__(self, id=None):
+        super().__init__(
+                "Resource not found",
+                "Resource with params {{id={}}} was not found.".format(id),
+                2,
+                404)
