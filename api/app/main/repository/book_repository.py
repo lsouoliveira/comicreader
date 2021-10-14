@@ -1,5 +1,5 @@
-from app.main import db
-from app.main.model.book import Book
+from app import db
+from app.models import Book
 
 def save(book):
     db.session.add(book)

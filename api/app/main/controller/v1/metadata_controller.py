@@ -1,3 +1,3 @@
-from app.main.dto.metadata import MetadataDto
+from app.main.dto import MetadataDto
 
 api = MetadataDto.api

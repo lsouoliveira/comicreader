@@ -1,3 +1,3 @@
-from app.main.dto.readingprogress import ReadingProgressDto
+from app.main.dto import ReadingProgressDto
 
 api = ReadingProgressDto.api

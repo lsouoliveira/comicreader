@@ -1,3 +1,3 @@
-from app.main.dto.bookprocess import BookProcessDto
+from app.main.dto import BookProcessDto
 
 api = BookProcessDto.api

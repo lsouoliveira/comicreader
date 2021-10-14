@@ -1,15 +1,23 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from flask_restx import Api
+from flask import Blueprint
 
-from .config import config_by_name
-from flask.app import Flask
+main_blueprint = Blueprint('main', __name__)
 
-db = SQLAlchemy()
+api = Api(
+    main_blueprint,
+    title='COMIC READER API',
+    version='1.0',
+    description='Comic Reader API.'
+)
 
-def create_app(config_name: str) -> Flask:
-    app = Flask(__name__)
-    app.config.from_object(config_by_name[config_name])
+from .controller.v1.book_controller import api as book_ns
+from .controller.v1.bookprocess_controller import api as bookprocess_ns
+from .controller.v1.readingprogress_controller import api as readingprogress_ns
+from .controller.v1.metadata_controller import api as metadata_ns
 
-    db.init_app(app)
+api.add_namespace(book_ns, path="/books")
+api.add_namespace(bookprocess_ns, path="/book-processes")
+api.add_namespace(readingprogress_ns, path="/reading-progresses")
+api.add_namespace(metadata_ns, path="/metadatas")
 
-    return app
+from . import errors

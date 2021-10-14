@@ -2,11 +2,11 @@ import unittest
 
 import datetime
 
-from app.main import db
-from app.main.model.book import Book, BookType
-from app.main.model.metadata import Metadata, DataType
-from app.main.model.bookprocess import BookProcess, ProcessStatus
-from app.main.model.readingprogress import ReadingProgress
+from app import db
+from app.models import Book, BookType
+from app.models import Metadata, DataType
+from app.models import BookProcess, ProcessStatus
+from app.models import ReadingProgress
 
 from app.test.base import BaseTestCase
 

@@ -2,13 +2,13 @@ from flask import request
 from flask_restx import Resource
 from flask_restx import Namespace
 from typing import Dict, Tuple
-from app.main import db
+
+from app import db
 from app.main.service.book_service import get_all_books, get_book_by_id, bookmark, mark_as_read
-from app.main.dto.book import BookDto
-from app.main.dto.bookprocess import BookProcessDto
+from app.main.dto import BookDto, BookProcessDto
 from app.main.util.pagination import PaginationUtils
 
-api = BookDto.api
+api = BookDto.api 
 
 @api.route('/')
 class BookList(Resource):

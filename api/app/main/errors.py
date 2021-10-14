@@ -1,9 +1,8 @@
-from flask import Blueprint, jsonify
+from flask import jsonify
 import traceback
 
-from ..exceptions.exceptions import InternalError, PageNotFoundError, ResourceNotFound
-
-errors = Blueprint('errors', __name__)
+from . import main_blueprint
+from app.exceptions import InternalError, PageNotFoundError, ResourceNotFound
 
 def create_error_response(error):
     payload = {
@@ -13,20 +12,20 @@ def create_error_response(error):
             }
     return jsonify(payload), error.status_code
 
-@errors.app_errorhandler(404)
+@main_blueprint.app_errorhandler(404)
 def handle_page_not_found(error):
     return create_error_response(PageNotFoundError())
 
-@errors.app_errorhandler(ResourceNotFound)
+@main_blueprint.app_errorhandler(ResourceNotFound)
 def handle_resource_not_found(error):
     return create_error_response(error)
 
-@errors.app_errorhandler(400)
+@main_blueprint.app_errorhandler(400)
 def handle_bad_request(error):
     print(error)
     return create_error_response(InternalError())
 
-@errors.app_errorhandler(Exception)
+@main_blueprint.app_errorhandler(Exception)
 def handle_unknown_error(error):
     print(traceback.format_exc())
     return create_error_response(InternalError())

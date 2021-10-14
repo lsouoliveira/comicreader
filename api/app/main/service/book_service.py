@@ -1,5 +1,5 @@
 from app.main.repository.book_repository import save, find, find_by_id
-from app.main.exceptions.exceptions import ResourceNotFound
+from app.exceptions import ResourceNotFound
 
 def save_book(book):
     return save(book)

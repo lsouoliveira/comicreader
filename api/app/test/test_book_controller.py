@@ -1,10 +1,9 @@
 import unittest
 
-from app.main import db
+from app import db
 import json
 from app.test.base import BaseTestCase
-from app.main.model.book import Book, BookType
-from app.main.model.readingprogress import ReadingProgress 
+from app.models import Book, BookType, ReadingProgress 
 
 def create_book():
     book = Book(
