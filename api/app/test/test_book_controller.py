@@ -21,7 +21,26 @@ def create_book():
 
     return book
 
+def load_comic_sample():
+    with open("data/sample.cbz", "rb") as f:
+        return f.read()
+
 class TestBookController(BaseTestCase):
+    def test_add_books(self):
+        with self.client:
+            payload = {}
+            payload['data'] = (load_comic_sample(), 'sample.cbz')
+
+            response = self.client.post(
+                    '/v1/books/',
+                    data=payload,
+                    content_type="multipart/form-data")
+
+            data = json.loads(response.data.decode())
+
+            self.assertTrue('data' in data)
+            self.assertEqual(len(data['data']), 1)
+            self.assertEqual(response.status_code, 200)
     def test_get_books(self):
         with self.client:
             create_book()
