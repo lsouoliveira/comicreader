@@ -19,6 +19,7 @@ class BookList(Resource):
                 get_all_books(),
                 BookDto.get_book)
 
+    @api.doc("add_books")
     def post(self):
         return '' 
 
