@@ -1,33 +1,23 @@
 import os
-import unittest
 
-from flask_migrate import Migrate, MigrateCommand
+from flask_migrate import MigrateCommand
 from flask_script import Manager
 from faker import Faker
 import uuid
+import unittest
+import json
 
-from app import api_blueprint
-from app.main import create_app, db
-from app.main.model import book, metadata, bookprocess, readingprogress 
-from app.main.errors import errors
+from app import create_app, db
+from app import models
 
-app = create_app(os.getenv('BOILERPLATE_ENV') or 'dev')
-app.register_blueprint(api_blueprint, url_prefix="/v1")
-app.register_blueprint(errors)
-
-app.app_context().push()
+app = create_app()
 
 manager = Manager(app)
-
-migrate = Migrate(app, db)
-
 manager.add_command('db', MigrateCommand)
-
 
 @manager.command
 def run():
     app.run()
-
 
 @manager.command
 def test():
@@ -47,33 +37,32 @@ def seed():
     for _ in range(50):
         num_pages = fake.pyint(1, 1000)
 
-        instance = book.Book(
+        instance = models.Book(
             cover_image = fake.file_name(category="image"),
             file_id = fake.uuid4(),
             num_pages = num_pages,
-            book_type = book.BookType.comic,
-            book_process = bookprocess.BookProcess(
+            book_type = models.BookType.comic,
+            book_process = models.BookProcess(
                    error_code=0,
-                   status=[bookprocess.ProcessStatus.running,
-                           bookprocess.ProcessStatus.finished,
-                           bookprocess.ProcessStatus.error
+                   status=[models.ProcessStatus.running,
+                           models.ProcessStatus.finished,
+                           models.ProcessStatus.error
                        ][fake.pyint(0, 2)],
                 ),
-            reading_progress = readingprogress.ReadingProgress(
+            reading_progress = models.ReadingProgress(
                     page = fake.pyint(1, num_pages),
                     read = fake.pybool() 
                 ),
             meta = [
-                    metadata.Metadata(
+                    models.Metadata(
                             key = "title",
                             value = fake.sentence(nb_words=4),
-                            data_type = metadata.DataType.string
+                            data_type = models.DataType.string
                         )
                 ]
         )
         db.session.add(instance)
         db.session.commit()
-
 
 if __name__ == '__main__':
     manager.run()

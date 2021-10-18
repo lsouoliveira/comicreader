@@ -24,7 +24,6 @@ def create_app() -> Flask:
 def initialize_extensions(app):
     db.init_app(app)
 
-
     migrate.init_app(app, db)
 
     @app.after_request
