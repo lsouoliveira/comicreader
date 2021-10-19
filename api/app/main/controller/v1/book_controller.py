@@ -4,7 +4,7 @@ from flask_restx import Namespace
 from typing import Dict, Tuple
 
 from app import db
-from app.main.service.book_service import get_all_books, get_book_by_id, bookmark, mark_as_read
+from app.main.service.book_service import get_all_books, get_book_by_id, bookmark, mark_as_read, add_books
 from app.main.dto import BookDto, BookProcessDto
 from app.main.util.pagination import PaginationUtils
 
@@ -21,7 +21,10 @@ class BookList(Resource):
 
     @api.doc("add_books")
     def post(self):
-        return '' 
+        files = request.files
+
+        books_added, errors =  add_books(files)
+
 
 @api.route('/<id>')
 @api.param('id', 'The book identifier')
