@@ -1,7 +1,9 @@
+from flask import jsonify
 from flask import request
 from flask_restx import Resource
 from flask_restx import Namespace
 from typing import Dict, Tuple
+from flask_restx import marshal
 
 from app import db
 from app.main.service.book_service import get_all_books, get_book_by_id, bookmark, mark_as_read, add_books
@@ -23,7 +25,15 @@ class BookList(Resource):
     def post(self):
         files = request.files
 
-        books_added, errors =  add_books(files)
+        books_added, errors = add_books(files)
+        data = marshal(books_added, BookDto.get_book) 
+
+        return jsonify(
+            {
+                'data': data,
+                'errors': []
+            }
+        )
 
 
 @api.route('/<id>')

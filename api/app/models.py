@@ -13,7 +13,7 @@ class Book(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     cover_image = db.Column(db.String(512), nullable=False)
-    file_id = db.Column(db.String(512), unique=True, nullable=False)
+    file_id = db.Column(db.String(512), nullable=False)
     num_pages = db.Column(db.Integer, nullable=False, default=0)
     book_type = db.Column("book_type", ENUM(BookType, name="booktype_enum"), nullable=False)
     meta = db.relationship("Metadata")

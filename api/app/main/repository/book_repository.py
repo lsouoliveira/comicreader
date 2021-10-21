@@ -7,6 +7,11 @@ def save(book):
 
     return book
 
+def save_batch(books):
+    for book in books:
+        db.session.add(book)
+    db.session.commit()
+
 def find():
     return Book.query
 

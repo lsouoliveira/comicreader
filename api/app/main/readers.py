@@ -20,6 +20,10 @@ class Reader(ABC):
     def get_cover(self) -> tuple[str, bytearray]:
         pass
 
+    @abstractmethod
+    def count_pages(self) -> int:
+        pass
+
 class CbzReader(Reader):
     file = None
 
@@ -40,9 +44,13 @@ class CbzReader(Reader):
             with cbz.open(cover_filename) as cover_file:
                 return secure_filename(cover_filename), cover_file.read()
 
+    def count_pages(self):
+        with zipfile.ZipFile(self.file, 'r') as cbz:
+            return len(cbz.namelist())
+
 
 class ReaderFactory:
-    def create(file_extension: str) -> Reader:
+    def create(self, file_extension: str) -> Reader:
         if file_extension == "cbz":
             return CbzReader()
 

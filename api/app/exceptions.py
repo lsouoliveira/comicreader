@@ -34,3 +34,13 @@ class ResourceNotFound(ApiError):
                 "Resource with params {{id={}}} was not found.".format(id),
                 2,
                 404)
+
+class FileNotSupported(ApiError):
+    def __init__(self, filename):
+        super().__init__(
+                "File not supported",
+                "The file could not be read.",
+                3,
+                400,
+                filename)
+

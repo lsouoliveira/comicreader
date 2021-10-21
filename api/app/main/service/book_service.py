@@ -1,14 +1,20 @@
+import traceback
+import uuid
 from app import models
-from app.exceptions import ResourceNotFound
-from app.main.repository.book_repository import save, find, find_by_id
+from app.exceptions import ResourceNotFound, FileNotSupported
+from app.main.repository.book_repository import save, save_batch, find, find_by_id
 from app.main.readers import ReaderFactory
 from app.main.util import file_utils
+from app.main.util import thumbnail_utils
 
 ALLOWED_EXTENSIONS = ['cbz']
 
 BOOK_TYPE = {
     'cbz': models.BookType.comic
 }
+
+THUMBNAIL_SIZE = (320, 200)
+THUMBNAIL_FOLDER = "uploads/thumbnails"
 
 reader_factory = ReaderFactory() 
 
@@ -21,8 +27,10 @@ def add_books(files):
 
     for file in files:
         try:
-            filename, file_ext = extract_extension(file)
+            image_file = files[file]
 
+            filename, file_ext = file_utils.extract_extension(image_file.filename)
+            
             if not file_ext in ALLOWED_EXTENSIONS:
                 raise FileNotSupported(file)
             
@@ -30,27 +38,21 @@ def add_books(files):
             reader = reader_factory.create(file_ext) 
 
             if not reader:
-                raise FileNotSupported(file_ext)
+                raise FileNotSupported(file)
 
-            image_name, image_data = reader.extract_cover()
+            reader.read(image_file.read())
 
-            # Create thumbnail 
-            _, image_ext = extract_extension(image_name)
+            # Create and save thumbnail 
+            image_name, image_data = reader.get_cover()
+            _, image_ext = file_utils.extract_extension(image_name)
 
-            # Resize image
-            # TODO
-
-            thumbnail_id = "..." 
-            thumbnail_filename = "{}.{}".format(thumbnail_id, image_ext)
-            thumbnail_path = THUMBNAIL_FOLDER + thumbnail_filename
-
-            with open(thumbnail_path, "wb") as f:
-                f.write(thumbnail_data)
+            thumbnail_name = "{}.{}".format(str(uuid.uuid4()), image_ext)
+            thumbnail_path = "{}/{}".format(THUMBNAIL_FOLDER, thumbnail_name)
+            thumbnail_utils.save_to(image_data, thumbnail_path, THUMBNAIL_SIZE)
 
             # Create book entity
-
             book = models.Book(
-                cover_image = thumbnail_path,
+                cover_image = thumbnail_name,
                 file_id = "",
                 num_pages = reader.count_pages(),
                 book_type = BOOK_TYPE[file_ext],
@@ -73,12 +75,18 @@ def add_books(files):
 
             books_added.append(book)
         except FileNotSupported as e:
+            traceback.print_exc()
             errors.append(e)
         except Exception as e:
-            errors.append(InvalidFile(file))
+            traceback.print_exc()
+            errors.append(FileNotSupported(file))
 
     # save books
-    # TODO
+    save_batch(books_added)
+
+    # Create tasks to process each book added
+    for book in books_added:
+        pass
 
     return books_added, errors
 
