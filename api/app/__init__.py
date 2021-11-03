@@ -1,21 +1,28 @@
 import os
-from flask import Flask
+from flask.app import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_script import Manager
 import json
+from celery import Celery
+from config import Config
 
-from flask.app import Flask
 
 db = SQLAlchemy()
 manager = Manager()
 migrate = Migrate()
+celery = Celery(
+        __name__,
+        broker=Config.CELERY_BROKER_URL,
+        result_backend=Config.CELERY_RESULT_BACKEND)
 
 def create_app() -> Flask:
     app = Flask(__name__)
 
     CONFIG_TYPE = os.getenv('CONFIG_TYPE', default='config.DevelopmentConfig')
     app.config.from_object(CONFIG_TYPE)
+
+    celery.conf.update(app.config)
 
     initialize_extensions(app)
     register_blueprints(app) 

@@ -31,7 +31,7 @@ class BookList(Resource):
         return jsonify(
             {
                 'data': data,
-                'errors': []
+                'errors': [e.to_dict() for e in errors]
             }
         )
 

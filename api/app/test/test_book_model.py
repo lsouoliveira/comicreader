@@ -3,7 +3,7 @@ import unittest
 import datetime
 
 from app import db
-from app.models import Book, BookType
+from app.models import Book, BookType, BookFormat
 from app.models import Metadata, DataType
 from app.models import BookProcess, ProcessStatus
 from app.models import ReadingProgress
@@ -16,9 +16,9 @@ class TestBookModel(BaseTestCase):
     def test_save(self):
         book = Book(
             cover_image = "image.jpg",
-            file_id = "file_id",
             num_pages = 100,
             book_type = BookType.comic,
+            book_format = BookFormat.cbz
         )
         db.session.add(book)
         db.session.commit()
@@ -26,9 +26,9 @@ class TestBookModel(BaseTestCase):
     def test_save_with_children(self):
         book = Book(
             cover_image = "image.jpg",
-            file_id = "file_id",
             num_pages = 100,
             book_type = BookType.comic,
+            book_format = BookFormat.cbz,
             meta = [
                     Metadata(
                         key = "title",
@@ -38,7 +38,8 @@ class TestBookModel(BaseTestCase):
                 ],
             book_process = BookProcess(
                     status = ProcessStatus.finished,
-                    error_code = 0
+                    error_code = 0,
+                    file_id = "file_id"
                  ),
             reading_progress = ReadingProgress(
                     page = 0,

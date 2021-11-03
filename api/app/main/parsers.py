@@ -1,9 +1,12 @@
 from abc import ABC, abstractmethod
 import zipfile
 import io
+from typing import Optional
+
 from werkzeug.utils import secure_filename
 
 from app.main.util import file_utils 
+from app.models import BookFormat
 
 ALLOWED_COMIC_IMAGES_EXT = ["png", "jpg", "jpeg"]
 
@@ -11,26 +14,30 @@ class InvalidImageType(Exception):
     def __init__(self):
         super.__init__()
 
-class Reader(ABC):
+class Parser(ABC):
     @abstractmethod
-    def read(self, data: bytearray) -> None:
+    def read(self, data: bytes) -> None:
         pass
 
     @abstractmethod
-    def get_cover(self) -> tuple[str, bytearray]:
+    def get_cover(self) -> tuple[str, bytes]:
         pass
 
     @abstractmethod
     def count_pages(self) -> int:
         pass
 
-class CbzReader(Reader):
+    @abstractmethod
+    def extract_to(self, path: str) -> None:
+        pass
+
+class CbzParser(Parser):
     file = None
 
-    def read(self, data: bytearray) -> None:
+    def read(self, data: bytes) -> None:
         self.file = io.BytesIO(data)
 
-    def get_cover(self) -> tuple[str, bytearray]:
+    def get_cover(self) -> tuple[str, bytes]:
         with zipfile.ZipFile(self.file, 'r') as cbz:
             files = cbz.namelist()
             files.sort()
@@ -48,10 +55,15 @@ class CbzReader(Reader):
         with zipfile.ZipFile(self.file, 'r') as cbz:
             return len(cbz.namelist())
 
+    def extract_to(self, path: str) -> None:
+        with zipfile.ZipFile(self.file, 'r') as cbz:
+            cbz.extractall(path)
 
-class ReaderFactory:
-    def create(self, file_extension: str) -> Reader:
-        if file_extension == "cbz":
-            return CbzReader()
+
+
+class ParserFactory:
+    def create(self, book_format: BookFormat) -> Optional[Parser]:
+        if book_format == BookFormat.cbz:
+            return CbzParser()
 
         return None

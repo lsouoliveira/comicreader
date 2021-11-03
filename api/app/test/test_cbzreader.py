@@ -3,7 +3,7 @@ import unittest
 import datetime
 
 from app import db
-from app.main.readers import CbzReader
+from app.main.parsers import CbzParser
 
 from app.test.base import BaseTestCase
 
@@ -15,11 +15,11 @@ def load_sample():
 
 class TestCbzReader(BaseTestCase):
     def test_get_cover(self):
-        reader = CbzReader()
+        parser = CbzParser()
         sample = load_sample()
 
-        reader.read(sample)
-        image_name, data = reader.get_cover()
+        parser.read(sample)
+        image_name, data = parser.get_cover()
 
         self.assertEqual(image_name, "1.jpg")
 

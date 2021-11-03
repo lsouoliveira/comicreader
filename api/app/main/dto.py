@@ -5,7 +5,8 @@ class BookProcessDto:
 
     get_bookprocess = api.model('get_bookprocess', {
         'error_code': fields.Integer(),
-        'status': fields.String()
+        'status': fields.String(),
+        'file_id': fields.String()
     })
 
 class MetadataDto:
@@ -36,7 +37,6 @@ class BookDto:
     get_book = api.model('get_book', {
         'id': fields.Integer(),
         'cover_image': fields.String(),
-        'file_id': fields.String(),
         'num_pages': fields.Integer(),
         'cover_image': fields.String(),
         'book_process': fields.Nested(BookProcessDto.get_bookprocess),

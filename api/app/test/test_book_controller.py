@@ -1,16 +1,19 @@
 import unittest
+import time
+
+from werkzeug.datastructures import FileStorage
 
 from app import db
 import json
 from app.test.base import BaseTestCase
-from app.models import Book, BookType, ReadingProgress 
+from app.models import Book, BookType, BookFormat, ReadingProgress 
 
 def create_book():
     book = Book(
         cover_image = "image.jpg",
-        file_id = "file_id",
         num_pages = 100,
         book_type = BookType.comic,
+        book_format = BookFormat.cbz,
         reading_progress = ReadingProgress(
             page=1,
             read=False
@@ -22,15 +25,13 @@ def create_book():
     return book
 
 def load_comic_sample():
-    with open("data/sample.cbz", "rb") as f:
-        return f.read()
+    return open("data/sample.cbz", "rb")
 
 class TestBookController(BaseTestCase):
     def test_add_books(self):
         with self.client:
             payload = {}
-            payload['file'] = [(load_comic_sample(), 'sample.cbz'),
-                    (load_comic_sample(), 'sample.cbz')]
+            payload['file'] = (load_comic_sample(), 'sample.cbz')
 
             response = self.client.post(
                     '/v1/books/',
@@ -50,9 +51,12 @@ class TestBookController(BaseTestCase):
 
             data = json.loads(response.data.decode())
 
+            time.sleep(1)
+
             self.assertTrue('data' in data)
             self.assertTrue('pagination' in data)
             self.assertEqual(len(data['data']), 1)
+            self.assertEqual(data['data']['book_process']['status'], 'finished')
             self.assertEqual(response.status_code, 200)
 
     def test_get_book_by_id(self):
