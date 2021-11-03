@@ -51,12 +51,9 @@ class TestBookController(BaseTestCase):
 
             data = json.loads(response.data.decode())
 
-            time.sleep(1)
-
             self.assertTrue('data' in data)
             self.assertTrue('pagination' in data)
             self.assertEqual(len(data['data']), 1)
-            self.assertEqual(data['data']['book_process']['status'], 'finished')
             self.assertEqual(response.status_code, 200)
 
     def test_get_book_by_id(self):
@@ -70,6 +67,13 @@ class TestBookController(BaseTestCase):
             self.assertTrue('data' in data)
             self.assertEqual(data['data']['id'], book_created.id)
             self.assertEqual(response.status_code, 200)
+
+    def test_get_page(self):
+        with self.client:
+            response = self.client.get('/v1/books/1/readers/comic/pages/1')
+
+            self.assertEqual(response.status_code, 404)
+
 
     def test_bookmark(self):
         with self.client:

@@ -6,7 +6,6 @@ from app.main.service import book_service
 from app.main.service import archive_service
 from app.models import BookFormat, ProcessStatus 
 
-BOOKS_EXTRACTED_FOLDER = "uploads/books"
 
 @celery.task(name="app.tasks.extract_archive")
 def extract_archive(book_id: int) -> None:
@@ -22,9 +21,7 @@ def extract_archive(book_id: int) -> None:
             book.book_process.file_id) 
 
     try:
-        archive_service.extract_archive(book_path,
-                "{}/{}".format(BOOKS_EXTRACTED_FOLDER, book_id),
-                book.book_format)
+        archive_service.extract_archive(book_path, str(book_id), book.book_format)
 
         book.book_process.status = ProcessStatus.finished
     except:

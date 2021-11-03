@@ -4,9 +4,11 @@ from flask_restx import Resource
 from flask_restx import Namespace
 from typing import Dict, Tuple
 from flask_restx import marshal
+from flask import send_file
 
 from app import db
 from app.main.service.book_service import get_all_books, get_book_by_id, bookmark, mark_as_read, add_books
+from app.main.service import archive_service
 from app.main.dto import BookDto, BookProcessDto
 from app.main.util.pagination import PaginationUtils
 
@@ -35,6 +37,14 @@ class BookList(Resource):
             }
         )
 
+@api.route('/<id>/readers/comic/pages/<page_number>')
+@api.param('id', 'The book identifier')
+@api.param('page_number', 'Page number')
+class ComicPage(Resource):
+    def get(self, id, page_number):
+        image_path = archive_service.get_comic_page(id, int(page_number))
+        
+        return send_file(image_path)
 
 @api.route('/<id>')
 @api.param('id', 'The book identifier')
