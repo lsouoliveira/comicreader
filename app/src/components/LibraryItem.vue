@@ -1,35 +1,13 @@
 <template>
 	<div class="library-item d-flex flex-column" @click="handleClick">
-		<v-card elevation="1">
 			<div class="thumbnail" :class="classObject">
 				<router-link to="comics/1/pages/1">
-					<img src="onepiece_vol1_cover.jpg" class="thumbnail__image"/>
+					<img src="onepiece_vol1_cover.jpg" class="thumbnail__image elevation-2"/>
 				</router-link>
 			</div>
-			<v-card-text>
-				<div class="d-flex align-center justify-space-between">
-					<div class="text-truncate">Vol 1 - One piece</div>
-					<v-menu offset-y>
-						<template v-slot:activator="{ on, attrs }">
-							<v-btn 
-								icon
-								v-bind="attrs"
-								v-on="on">
-								<v-icon>mdi-dots-vertical</v-icon>
-							</v-btn>
-						</template>
-						<v-list>
-							<v-list-item link>
-								<v-list-item-title>Mark as read</v-list-item-title>
-							</v-list-item>
-							</v-list>
-					</v-menu>
-				</div>
-				<div>
-					<v-chip color="green" text-color="white" v-if="read">Lido</v-chip>
-				</div>
-			</v-card-text>
-		</v-card>
+			<div class="library-item__title">
+				<span>One Piece - vol 1</span>
+			</div>
 	</div>
 </template>
 
@@ -61,9 +39,17 @@
 	};
 </script>
 
-<style>
+<style scoped>
 	.library-item {
 		position: relative;
+	}
+
+	.library-item__title {
+		text-align: center;
+	}
+
+	.library-item__title span {
+		text-align: center;
 	}
 
 	.thumbnail {

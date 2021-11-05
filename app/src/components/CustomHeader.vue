@@ -1,20 +1,13 @@
 <template>
-	<v-app-bar app dark color="primary">
-		<v-toolbar-title class="title">Comic Reader</v-toolbar-title>
+	<v-app-bar app flat color="surface" class="px-10">
 		<slot />
 	</v-app-bar>
 </template>
 
 <script>
-	export default {
-			name: 'CustomHeader',
-			props: {
-				logo: {
-					type: Boolean,
-					default: false
-				}
-			},
-			components: {
-			}
-		};
+export default {
+	name: 'CustomHeader',
+	components: {
+	}
+};
 </script>
