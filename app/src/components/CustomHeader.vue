@@ -1,5 +1,5 @@
 <template>
-	<v-app-bar app flat color="surface" class="px-10">
+	<v-app-bar app flat color="surface">
 		<slot />
 	</v-app-bar>
 </template>

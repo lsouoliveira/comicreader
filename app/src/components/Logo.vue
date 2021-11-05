@@ -1,5 +1,5 @@
 <template>
-	<v-toolbar-title class="title logo">comic reader</v-toolbar-title>
+	<v-toolbar-title class="title logo primary--text">comic reader</v-toolbar-title>
 </template>
 
 <script>
