@@ -1,31 +1,22 @@
 <template>
 	<table class="table">
 		<tr>
-			<th class="body-1" v-for="item in tableHeaders" :key="item.text" @click="() => sort(item)">
+			<th class="body-1" v-for="item in headers" :key="item.key" @click="() => sort(item)">
 				<div>
-				{{ !item.hide && item.text || "" }}
-				<v-icon small class="ml-3" v-if="!item.hide" >{{ getSortIcon(item.sort) }}</v-icon>
-			</div>
+					{{ !item.hide && item.text || "" }}
+					<v-icon small class="ml-3">{{ getSortIcon(item) }}</v-icon>
+				</div>
 			</th>
 		</tr>
 		<tr class="table__row" v-for="item in data" :key="item.id">
-			<td v-for="header in tableHeaders" :key="header.text" class="pa-2">
+			<td v-for="header in headers" :key="header.key">
 				{{ item[header.value] }}
 				<slot
-					:name="header.text"
+					:name="header.key"
 					:item="item"
 				>
 				</slot>
 			</td>
-			<!--
-			<td>
-				<div style="display: flex; justify-content: flex-end;" class="mr-5">
-					<v-btn icon>
-						<v-icon>mdi-plus</v-icon>
-					</v-btn>
-				</div>
-			</td>
-			-->
 		</tr>
 	</table>
 </template>
@@ -38,51 +29,49 @@ export default {
 			default: []
 		},
 		data: {
-			default: []
+			default() {
+				return []
+			}
 		}
 	},
 	data() {
 		return {
-			tableHeaders: this.headers
+			sortedField: null,
+			sortType: undefined
 		}
 	},
 	methods: {
-		sort(item) {
-			const itemFound = this.tableHeaders.find(header => header.text === item.text)
-			if(!itemFound) return
-			const updatedHeaders = this.tableHeaders.map(header => {
-				if(header.text !== item.text) {
-					header.sort = undefined
-				} else {
-					let sortType = header.sort
+		sort(header) {
+			const foundHeader = this.headers.find(h => h.key === header.key)
 
-					switch(sortType) {
-						case undefined:
-							header.sort = "sort_asc"
-							break
-						case "sort_asc":
-							header.sort = "sort_desc"
-							break
-						default:
-							header.sort = undefined
-					}
-				}
+			if(!foundHeader) return
 
-				return header
-			})
-			this.tableHeaders = updatedHeaders
+			this.sortedField = foundHeader.key
+
+			switch(this.sortType) {
+				case undefined:
+					this.sortType = "sort_asc"
+				break
+				case "sort_asc":
+					this.sortType = "sort_desc"
+				break
+				default:
+					this.sortType = undefined
+			}
 		},
-		getSortIcon(sort) {
-			if(sort === "sort_asc") {
+		getSortIcon(header) {
+			if(header.key !== this.sortedField) {
+				return null
+			}
+
+			if(this.sortType === "sort_asc") {
 				return "mdi-sort-ascending"
-			} else if(sort === "sort_desc") {
+			} else if(this.sortType === "sort_desc") {
 				return "mdi-sort-descending"
 			}
-		
+
 			return "";
 		}
-	},
-	computed: {
 	}
 }
 </script>
@@ -91,6 +80,7 @@ export default {
 .table {
 	width: 100%;
 	border-spacing: 0 0.75rem;
+	table-layout: fixed;
 }
 
 .table td {
@@ -100,6 +90,7 @@ export default {
 
 .table td:first-child {
 	border-radius: 0.5rem 0 0 0.5rem;
+	padding: 0.5rem;
 }
 
 .table td:last-child {
