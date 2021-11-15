@@ -1,10 +1,10 @@
 <template>
 	<v-card flat>
-		<v-card-text class="pa-8">
+		<v-card-text class="pa-6">
 			<div class='cover'>
-				<img src='../../public/onepiece_vol1_cover.jpg'/>
+				<img src='../../public/onepiece_vol1_cover.jpg' class="cover__img rounded-lg"/>
 			</div>
-			<div class='font-weight-bold mt-5'>
+			<div class='mt-4'>
 				One piece - vol 1 
 			</div>
 		</v-card-text>
