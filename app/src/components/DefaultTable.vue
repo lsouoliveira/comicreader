@@ -1,7 +1,7 @@
 <template>
 	<table class="table">
 		<tr>
-			<th class="body-1" v-for="item in headers" :key="item.key" @click="() => sort(item)">
+			<th class="subtitle-1" v-for="item in headers" :key="item.key" @click="() => sort(item)">
 				<div>
 					{{ !item.hide && item.text || "" }}
 					<v-icon small class="ml-3">{{ getSortIcon(item) }}</v-icon>
@@ -90,7 +90,7 @@ export default {
 
 .table td:first-child {
 	border-radius: 0.5rem 0 0 0.5rem;
-	padding: 0.5rem;
+	padding: 0.5rem 0.75rem;
 }
 
 .table td:last-child {
@@ -101,6 +101,8 @@ export default {
 	padding: 0.75rem 0rem;
 	text-align: left;
 	user-select: none;
+	color: var(--v-alt-base);
+	font-weight: 600;
 }
 
 .table th div {

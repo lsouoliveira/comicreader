@@ -4,7 +4,7 @@
 			<div class='cover'>
 				<img src='../../public/onepiece_vol1_cover.jpg' class="cover__img rounded-lg"/>
 			</div>
-			<div class='mt-4'>
+			<div class='mt-4 body-2 primary--text'>
 				One piece - vol 1 
 			</div>
 		</v-card-text>

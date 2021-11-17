@@ -5,7 +5,7 @@
 			:data="books"
 		>
 			<template v-slot:title="slotProps">
-				<div class="books-table__title">
+				<div class="books-table__title body-1">
 					<img src="../../public/onepiece_vol1_cover.jpg" style="width: 4rem; 4rem;" class="rounded-sm"/>
 
 					<div class="books-table__title-text ml-6">
@@ -33,7 +33,7 @@
 
 			<template v-slot:added_at>
 				<div style="display: flex; align-items: center; justify-content: space-between;" class="mr-5">
-					<span>20/01/2020</span>
+					<span class="body-1 alt--text">20/01/2020</span>
 					<v-btn icon>
 						<v-icon>mdi-dots-horizontal</v-icon>
 					</v-btn>
