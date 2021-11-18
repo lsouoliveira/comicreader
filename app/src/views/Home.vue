@@ -4,9 +4,9 @@
 		<template v-slot:header>
 			<logo />
 			<v-spacer />
-			<v-btn icon >
+			<v-btn icon @click="handleOpenFileDialog">
 				<v-icon>mdi-plus</v-icon>
-			</v-btn>
+				</v-btn>
 		</template>
 		<template v-slot:main>
 			<v-container>
@@ -31,11 +31,8 @@
 						</div>
 					</div>
 					<div class="tabs__content py-5">
-						<div class="gallery">
-							<div class="gallery__item mr-6">
-								<book-card />
-							</div>
-							<div class="gallery__item mr-6">
+						<div class="gallery pb-5">
+							<div class="gallery__item mr-6" v-for="item in Array(20)" :key="item">
 								<book-card />
 							</div>
 						</div>
@@ -49,6 +46,7 @@
 					/>
 				</div>
 			</v-container>
+			<file-upload-dialog :dialog="isFileDialogOpened" @close="isFileDialogOpened = false" />
 		</template>
 	</default-layout>
 </template>
@@ -58,6 +56,7 @@ import DefaultLayout from './../layout/DefaultLayout.vue'
 import Logo from './../components/Logo.vue'
 import BookCard from './../components/BookCard.vue'
 import BooksTable from './../components/BooksTable.vue'
+import FileUploadDialog from './../components/FileUploadDialog.vue'
 
 export default {
 	name: 'Home',
@@ -65,10 +64,12 @@ export default {
 		DefaultLayout,
 		Logo,
 		BookCard,
-		BooksTable
+		BooksTable,
+		FileUploadDialog
 	},
 	data() {
 		return {
+			isFileDialogOpened: false,
 			headers: [
 				{
 					key: "title",
@@ -500,8 +501,13 @@ export default {
 			]
 		}
 	},
-	computed:{
-		theme(){
+	methods: {
+		handleOpenFileDialog() {
+			this.isFileDialogOpened = true
+		}
+	},
+	computed: {
+		theme() {
 			return (this.$vuetify.theme.dark) ? 'dark' : 'light'
 		}
 	}
