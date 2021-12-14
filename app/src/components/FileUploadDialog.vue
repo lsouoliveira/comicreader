@@ -11,8 +11,11 @@
 				</v-card-title>
 
 				<v-divider />
-				<div class="py-4 px-6">
-					<drag-and-drop-area />
+				<div class="pt-4">
+					<div class="px-4">
+						<drag-and-drop-area />
+					</div>
+					<uploading-list />
 				</div>
 			</v-card>
 		</v-dialog>
@@ -21,11 +24,13 @@
 
 <script>
 import DragAndDropArea from "./DragAndDropArea.vue"
+import UploadingList from "./UploadingList.vue"
 
 export default {
 	name: "FileUploadDialog",
 	components: {
-		DragAndDropArea
+		DragAndDropArea,
+		UploadingList
 	},
 	props: {
 		dialog: {

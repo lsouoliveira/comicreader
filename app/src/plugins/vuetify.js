@@ -15,7 +15,8 @@ export default new Vuetify({
 				background: "#eeeeee",
 				warning: "#ffb74d",
 				surface: '#ffffff',
-				alt: "#9e9e9e"
+				alt: "#9e9e9e",
+				green: "#81c784"
       }
     },
 		dark: false,

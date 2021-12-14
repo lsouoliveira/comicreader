@@ -15,36 +15,13 @@
 						<v-col md="5">
 							<v-text-field
 								solo
-								flat
 								placeholder="Type a comic name"
 								append-icon="mdi-magnify"
 								hide-details/>
 						</v-col>
 					</v-row>
 				</div>
-				<div class="tabs-container">
-					<div class="tabs">
-						<div class="tabs__names">
-							<div>
-								<span class="body-2 font-weight-bold">Recently added</span>
-							</div>
-						</div>
-					</div>
-					<div class="tabs__content py-5">
-						<div class="gallery pb-5">
-							<div class="gallery__item mr-6" v-for="item in Array(20)" :key="item">
-								<book-card />
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<div class="books-table-container mt-12">
-					<books-table
-						:headers="headers"
-						:books="books"
-					/>
-				</div>
+				<book-gallery />
 			</v-container>
 			<file-upload-dialog :dialog="isFileDialogOpened" @close="isFileDialogOpened = false" />
 		</template>
@@ -54,18 +31,16 @@
 <script>
 import DefaultLayout from './../layout/DefaultLayout.vue'
 import Logo from './../components/Logo.vue'
-import BookCard from './../components/BookCard.vue'
-import BooksTable from './../components/BooksTable.vue'
 import FileUploadDialog from './../components/FileUploadDialog.vue'
+import BookGallery from './../components/BookGallery.vue'
 
 export default {
 	name: 'Home',
 	components: {
 		DefaultLayout,
 		Logo,
-		BookCard,
-		BooksTable,
-		FileUploadDialog
+		FileUploadDialog,
+		BookGallery
 	},
 	data() {
 		return {

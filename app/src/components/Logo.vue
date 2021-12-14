@@ -1,5 +1,5 @@
 <template>
-	<v-toolbar-title class="title logo primary--text"><a href="/">comic reader</a></v-toolbar-title>
+	<v-toolbar-title class="logo primary--text"><a href="/">Comic Reader</a></v-toolbar-title>
 </template>
 
 <script>
@@ -12,7 +12,6 @@ export default {
 
 <style scoped>
 .logo {
-	text-transform: uppercase;
 	font-weight: bold;
 }
 
