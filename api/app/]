@@ -1,7 +1,6 @@
 from typing import Optional, Tuple
 from os import listdir, path
 import mimetypes
-import uuid
 
 from app.main.parsers import CbzParser, Parser, ParserFactory
 from app.exceptions import ResourceNotFound
@@ -10,7 +9,6 @@ from app.main.util import file_utils
 from app.models import BookFormat
 
 BOOKS_EXTRACTED_FOLDER = "uploads/books"
-BOOKS_PROCESSING_FOLDER = "uploads/processing"
 THUMBNAIL_FOLDER = "public/thumbnails"
 THUMBNAIL_SIZE = (320, 200)
 
@@ -45,7 +43,7 @@ def get_comic_page(book_id: int, page_number: int) -> str:
 
     raise ResourceNotFound(page_number)
 
-def save_thumbnail(data, image_name):
+def save_thumbnail(image_data, image_name):
     """Return a file path to a thumbnail created."""
     _, image_ext = file_utils.extract_extension(image_name)
 
@@ -55,11 +53,3 @@ def save_thumbnail(data, image_name):
     thumbnail_utils.save_to(data, thumbnail_path, THUMBNAIL_SIZE)
 
     return thumbnail_name
-
-def save_book_for_processing(file_data, file_extension):
-    file_id = "{}.{}".format(str(uuid.uuid4()), file_extension)
-
-    with open("{}/{}".format(BOOKS_PROCESSING_FOLDER, file_id), 'wb') as f:
-        f.write(file_data)
-
-    return file_id

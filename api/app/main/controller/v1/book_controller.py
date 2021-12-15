@@ -7,7 +7,8 @@ from flask_restx import marshal
 from flask import send_file
 
 from app import db
-from app.main.service.book_service import get_all_books, get_book_by_id, bookmark, mark_as_read, add_book
+from app.main.service.book_service import get_all_books, get_book_by_id, bookmark, mark_as_read
+from app.main.service import library_service
 from app.main.service import archive_service
 from app.main.dto import BookDto, BookProcessDto
 from app.main.util.pagination import PaginationUtils
@@ -32,7 +33,7 @@ class BookList(Resource):
 
         uploaded_file = request.files["file"]
 
-        return add_book(uploaded_file)
+        return library_service.add_book(uploaded_file)
 
 @api.route('/<id>/readers/comic/pages/<page_number>')
 @api.param('id', 'The book identifier')

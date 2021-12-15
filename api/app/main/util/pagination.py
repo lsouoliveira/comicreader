@@ -1,8 +1,7 @@
-from flask import jsonify
+from flask import jsonify, request
 from flask_restx import Model
 from flask_restx.fields import Boolean, DateTime, Integer, List, Nested, String, Url
 from flask_restx import marshal
-from flask_restful import request
 
 pagination_model = pagination_model = Model(
     "Pagination",
