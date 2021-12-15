@@ -41,7 +41,6 @@ class TestBookController(BaseTestCase):
             data = json.loads(response.data.decode())
 
             self.assertTrue('data' in data)
-            self.assertEqual(len(data['data']), 1)
             self.assertEqual(response.status_code, 200)
     def test_get_books(self):
         with self.client:

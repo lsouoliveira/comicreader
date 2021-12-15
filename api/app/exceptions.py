@@ -44,3 +44,12 @@ class FileNotSupported(ApiError):
                 400,
                 filename)
 
+class EmptyFile(ApiError):
+    def __init__(self):
+        super().__init__(
+            "Empty file",
+            "The file could not be found.",
+            4,
+            400
+        )
+

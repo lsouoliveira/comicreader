@@ -7,10 +7,11 @@ from flask_restx import marshal
 from flask import send_file
 
 from app import db
-from app.main.service.book_service import get_all_books, get_book_by_id, bookmark, mark_as_read, add_books
+from app.main.service.book_service import get_all_books, get_book_by_id, bookmark, mark_as_read, add_book
 from app.main.service import archive_service
 from app.main.dto import BookDto, BookProcessDto
 from app.main.util.pagination import PaginationUtils
+from app.exceptions import EmptyFile
 
 api = BookDto.api 
 
@@ -24,18 +25,14 @@ class BookList(Resource):
                 BookDto.get_book)
 
     @api.doc("add_books")
+    @api.marshal_with(BookDto.get_book, envelope="data")
     def post(self):
-        files = request.files
+        if not "file" in request.files:
+            raise EmptyFile()
 
-        books_added, errors = add_books(files)
-        data = marshal(books_added, BookDto.get_book) 
+        uploaded_file = request.files["file"]
 
-        return jsonify(
-            {
-                'data': data,
-                'errors': [e.to_dict() for e in errors]
-            }
-        )
+        return add_book(uploaded_file)
 
 @api.route('/<id>/readers/comic/pages/<page_number>')
 @api.param('id', 'The book identifier')
