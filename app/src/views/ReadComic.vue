@@ -1,7 +1,7 @@
 <template>
 	<v-app>
 		<v-app-bar app dark color="primary" v-if="isControlsEnabled">
-			<v-toolbar-title class="title">Vol 1 - Romance Dawn</v-toolbar-title>
+			<v-toolbar-title class="title">{{this.book && this.book.title}}</v-toolbar-title>
 			<v-spacer/>
 			<v-menu offset-y>
 				<template v-slot:activator="{ on, attrs }">
@@ -14,8 +14,7 @@
 					</v-btn>
 				</template>
 				<v-list>
-					<v-list-item link @click="setDisplayMode('fit-height')">
-						Adjust to height
+					<v-list-item link @click="setDisplayMode('fit-height')"> Adjust to height
 					</v-list-item>
 					<v-list-item link @click="setDisplayMode('fit-width')">
 						Adjust to width
@@ -38,19 +37,21 @@
 					:zoom-scale="normalizedZoomScale"
 					:bottom-spacing="isControlsEnabled"
 					:page="page"
+					:percent="percent"
 					:num-pages="numPages"
 					:remain-images-to-trigger="remainImagesToTrigger"
 					:pages="pages"
 					:is-loading-images-before="isLoadingImagesBefore"
 					:is-loading-images-after="isLoadingImagesAfter"
 					:is-loading-comic="isLoadingComic"
+					@scroll-change="handleScrollChange"
 					@page-load="handlePageLoaded"
 					@page-change="handleComicReaderPageChange"
 					@load-more="handleComicReaderLoadMore"
 					@ready="handleComicReaderReady"
 				/>
 			</div>
-			<loading :show="isLoadingComic && !isComicReaderReady" />
+			<loading :show="isLoadingComic || !isComicReaderReady" />
 		</v-main>
 		<v-app-bar
 			fixed
@@ -73,6 +74,9 @@ import PageCounter from './../components/PageCounter.vue'
 import ZoomControl from './../components/ZoomControl.vue'
 import ComicReader from './../components/ComicReader.vue'
 import Loading from './../components/Loading.vue'
+import BookService from './../services/BookService'
+
+const API_URL = process.env.VUE_APP_COMIC_READER_API
 
 export default {
 	name: 'ReadComic',
@@ -87,7 +91,8 @@ export default {
 			isControlsEnabled: true,
 			displayMode: '',
 			zoomScale: 100,
-			page: 10,
+			page: 1,
+			percent: 0,
 			numPages: 20,
 			remainImagesToTrigger: 3,
 			numPreloadedImages: 5,
@@ -99,16 +104,29 @@ export default {
 			isLoadingImagesBefore: false,
 			isLoadingImagesAfter: false,
 			isLoadingComic: true,
-			isComicReaderReady: false
+			isComicReaderReady: false,
+      comicBookId: null,
+      book: null,
+      bookmarkTimeout: null,
+      bookmarkInterval: 500
 		};
 	},
 	methods: {
 		handleComicReaderReady() {
 			this.isComicReaderReady = true;
 		},
+		handleScrollChange(e) {
+      if(this.bookmarkTimeout) {
+        clearTimeout(this.bookmarkTimeout)
+      }
+
+      this.bookmarkTimeout = setTimeout(() => {
+        BookService.bookmark(this.book.id, { page: this.page, percent: e.percent })
+      }, this.bookmarkInterval);
+		},
 		handleComicReaderPageChange(newPage) {
 			this.page = newPage;
-		},
+    },
 		handleComicReaderLoadMore(loadAfter) {
 			const visiblePages = this.pages.filter(page => page.isVisible);
 			const numVisiblePages = visiblePages.length;
@@ -120,7 +138,7 @@ export default {
 				loadAfter && this.isLoadingImagesAfter ||
 				!loadAfter && this.isLoadingImagesBefore) return;
 
-			if(loadAfter && lastPageIndex < this.numPages) {
+			if(loadAfter && lastPageIndex <= this.numPages) {
 				this.isLoadingImagesAfter = true;
 				this.loadMore(lastPageIndex + 1, lastPageIndex + this.numPreloadedImages, false);
 			} else if(firstPageIndex > 1) {
@@ -138,7 +156,7 @@ export default {
 				if(!page) {
 					const newPage = {
 						index: i,
-						url: "https://picsum.photos/333/500",
+						url: this.createPageUrl(i),
 						isVisible: false,
 						isLoaded: false,
 						isBefore: isBefore,
@@ -185,6 +203,7 @@ export default {
 			this.isControlsEnabled = !this.isControlsEnabled;
 		},
 		handleComicReaderDoubleClick() {
+      return
 		},
 		setDisplayMode(displayMode) {
 			this.displayMode = displayMode;
@@ -240,7 +259,7 @@ export default {
 				this.isLoadingImagesBefore = true;
 			}
 
-			if(pageIndex < this.numPages) {
+			if(pageIndex <= this.numPages) {
 				this.isLoadingImagesAfter = true;
 			}
 
@@ -262,7 +281,7 @@ export default {
 				} else {
 					const newPage = {
 						index: i,
-						url: "https://picsum.photos/333/500",
+						url: this.createPageUrl(i),
 						isVisible: false,
 						isLoaded: false,
 						img: null
@@ -287,7 +306,31 @@ export default {
 			if(!this.pagesLoadingBefore.length) {
 				this.onImagesBeforeLoaded();
 			}
-		}
+		},
+    async loadBook(bookId) {
+      BookService.getBook(bookId)
+        .then(res => {
+          const data = res.data
+          const book = data.data 
+          const titleMetafield = book.meta.find(meta => meta.key === 'title')
+          const bookTitle = titleMetafield.value || ''
+          this.book = {
+            id: book.id,
+            title: bookTitle
+          }
+          this.numPages = book.num_pages
+          this.page = book.reading_progress.page
+          this.percent = book.reading_progress.percent
+
+          this.loadPages(this.page)
+        })
+        .catch(_ => {
+          alert('book not found')
+        })
+    },
+    createPageUrl(pageIndex) {
+      return `${API_URL}/books/${this.book.id}/readers/comic/pages/${pageIndex}`
+    }
 	},
 	computed: {
 		normalizedZoomScale() {
@@ -298,9 +341,10 @@ export default {
 				"main-wrapper--padding-bottom": this.isControlsEnabled
 			}
 		}
-	},
+  },
 	mounted() {
-		this.loadPages(10);
+    this.comicBookId = this.$route.params.id
+    this.loadBook(this.comicBookId)
 	}
 }
 </script>

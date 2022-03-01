@@ -9,7 +9,7 @@
 					<span>Drag and drop, or <span class="font-weight-bold">browse</span> your files</span>
 				</div>
 			</div>
-			<input type="file" hidden @change="handleFileBrowserChange"/>
+			<input type="file" hidden @change="handleFileBrowserChange" accept=".cbz"/>
 		</label>
 	</div>
 </template>

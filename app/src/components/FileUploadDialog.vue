@@ -1,8 +1,7 @@
 <template>
 	<div class="text-center">
 		<v-dialog
-			:value="dialog"
-			@click:outside="handleCloseDialog"
+			v-model="isDialogOpen"
 			width="640"
 		>
 			<v-card>
@@ -13,34 +12,61 @@
 				<v-divider />
 				<div class="pt-4">
 					<div class="px-4">
-						<drag-and-drop-area />
+						<drag-and-drop-area @change="handleFileDropped"/>
 					</div>
-					<uploading-list />
+					<uploading-list :uploaded-files="uploadedFiles"/>
 				</div>
 			</v-card>
 		</v-dialog>
 	</div>
 </template>
 
-<script>
+<script lang="ts">
+import { Vue, Component, Watch } from 'vue-property-decorator'
 import DragAndDropArea from "./DragAndDropArea.vue"
 import UploadingList from "./UploadingList.vue"
+import { UploadedFile } from "../types/uploaded_file"
 
-export default {
-	name: "FileUploadDialog",
-	components: {
+const FileUploadDialogProps = Vue.extend({
+  props: {
+    show: {
+      type: Boolean,
+      default: false
+    },
+    uploadedFiles: {
+      type: Array as () => Array<UploadedFile>,
+      default: () => []
+    }
+  }
+})
+
+@Component({
+  components: {
 		DragAndDropArea,
 		UploadingList
-	},
-	props: {
-		dialog: {
-			default: false
-		}
-	},
-	methods: {
-		handleCloseDialog() {
-			this.$emit("close")
-		}
-	}
+  }
+})
+export default class FileUploadDialog extends FileUploadDialogProps {
+  isDialogOpen = false 
+
+  handleCloseDialog(): void {
+    this.$emit("close")
+  }
+
+  handleFileDropped(e: Event): void {
+    this.$emit('fileDropped', e)
+  }
+
+  @Watch("show")
+  watchShow(newValue: boolean): void {
+    this.isDialogOpen = newValue
+  }
+
+  @Watch("isDialogOpen")
+  watchIsDialogOpen(newValue: boolean): void {
+    if(!newValue) {
+      this.$emit("close")
+    }
+  }
 }
 </script>

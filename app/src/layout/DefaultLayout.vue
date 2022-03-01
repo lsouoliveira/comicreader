@@ -9,18 +9,19 @@
 	</v-app>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue'
 import CustomHeader from './../components/CustomHeader.vue'
+import Component from 'vue-class-component'
 
-export default {
-	name: 'DefaultLayout',
-	components: {
-		CustomHeader
-	},
-	computed:{
-    theme(){
-      return (this.$vuetify.theme.dark) ? 'dark' : 'light'
-    }
+@Component({
+  components: {
+    CustomHeader
+  }
+})
+export default class DefaultLayout extends Vue {
+  get theme(): string {
+    return (this.$vuetify.theme.dark) ? 'dark' : 'light'
   }
 }
 </script>

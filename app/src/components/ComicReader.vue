@@ -60,7 +60,11 @@ export default {
 		isLoadingImagesAfter: {
 			type: Boolean,
 			default: false
-		}
+		},
+    percent: {
+      type: Number,
+      default: 0
+    }
 	},
 	data() {
 		return {
@@ -117,7 +121,7 @@ export default {
 
 			return visiblePages[visiblePages.length - 1].index;
 		},
-		handleScrollPositionChange() {
+		handleScrollPositionChange(e) {
 			if(!this.isInfiniteScrollEnabled) return;
 
 			const currentPage = this.getCurrentPageByScrollPosition();
@@ -125,6 +129,16 @@ export default {
 			if(currentPage != this.page) {
 				this.onPageChange(currentPage);
 			}
+
+			const currentPageObject = this.pages.find(page => page.index === this.page);
+
+      if(currentPageObject && currentPageObject.img) {
+				const rootElementTop = this.$el.getBoundingClientRect().top + window.scrollY;
+				const imgTop = currentPageObject.img.getBoundingClientRect().top;
+				const elementScrollPos = imgTop + window.scrollY - rootElementTop - PAGE_MARGIN_TOP;
+
+        this.$emit('scroll-change', { event: e, percent: elementScrollPos - window.scrollY })
+      }
 		},
 		onPageChange(newPage) {
 			this.$emit("page-change", newPage);
@@ -156,7 +170,7 @@ export default {
 			if(currentPage) {
 				const rootElementTop = this.$el.getBoundingClientRect().top + window.scrollY;
 				const imgTop = currentPage.img.getBoundingClientRect().top;
-				const elementScrollPos = imgTop + window.scrollY - rootElementTop - PAGE_MARGIN_TOP;
+				const elementScrollPos = imgTop + window.scrollY - rootElementTop - PAGE_MARGIN_TOP - this.percent;
 
 				this.scrollTargetPosition = elementScrollPos;
 

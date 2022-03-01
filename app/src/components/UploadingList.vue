@@ -1,17 +1,36 @@
 <template>
 	<div class="uploading-list pa-4">
-		<uploading-item filename="one piece - vol 1.cbz" progress="0.5" v-for="item in Array(5)" :key="item" />
+		<uploading-item 
+      v-for="item in uploadedFiles"
+      :key="item.id"
+      :filename="item.name"
+      :uploaded-size="item.uploaded_size"
+      :file-size="item.size"
+      :status="item.status"
+    />
 	</div>
 </template>
 
-<script>
+<script lang="ts">
+import { Vue, Component, Watch } from 'vue-property-decorator'
 import UploadingItem from "./UploadingItem.vue"
+import { UploadedFile } from "../types/uploaded_file"
 
-export default {
-	name: "UploadingList",
-	components: {
-		UploadingItem
-	}
+const UploadingListProps = Vue.extend({
+  props: {
+    uploadedFiles: {
+      type: Array as () => Array<UploadedFile>,
+      default: () => []
+    }
+  }
+})
+
+@Component({
+  components: {
+    UploadingItem
+  }
+})
+export default class UploadingList extends UploadingListProps {
 }
 </script>
 

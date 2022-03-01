@@ -1,10 +1,12 @@
 <template>
 	<div class="book-card">
-		<div class='cover'>
-			<img src='../../public/onepiece_vol1_cover.jpg' class="cover__img"/>
-		</div>
+    <a :href="readerUrl">
+      <div class='cover'>
+        <img :src='thumbnailUrl'/>
+      </div>
+    </a>
 		<div class="mt-1 book-card__info-header">
-				<a class="font-weight-bold text-body-1 primary--text book-card__title me-1">One piece - vol 1aaaaaaaaaaa</a>
+				<a class="font-weight-bold text-body-1 primary--text book-card__title me-1">{{title}}</a>
 			<div>
 				<v-btn small icon class="primary--text">
 					<v-icon style="font-size: 1.42rem;">mdi-dots-vertical</v-icon>
@@ -24,7 +26,19 @@ export default {
 		read: {
 			type: Boolean,
 			default: false
-		}
+		},
+    title: {
+      type: String,
+      default: ""
+    },
+    thumbnailUrl: {
+      type: String,
+      default: ""
+    },
+    readerUrl: {
+      type: String,
+      default: ""
+    }
 	}
 }
 </script>

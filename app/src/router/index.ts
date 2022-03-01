@@ -1,27 +1,25 @@
 import Vue from 'vue'
-import VueRouter from 'vue-router'
+import VueRouter, { RouteConfig } from 'vue-router'
 import Home from '../views/Home.vue'
-import AddComics from '../views/AddComics.vue'
 import ReadComic from '../views/ReadComic.vue'
 
 Vue.use(VueRouter)
 
-const routes = [
+const routes: Array<RouteConfig> = [
   {
     path: '/',
     name: 'Home',
     component: Home
   },
-	{
-		path: '/comics/add',
-		name: 'AddComics',
-		component: AddComics
-	},
-	{
-		path: '/comics/:id/pages/:page',
-		name: 'ReadComic',
-		component: ReadComic
-	}
+  {
+    path: '/readers/comic-reader/:id',
+    name: 'ReadComic',
+    component: ReadComic
+  },
+  {
+    path: '*',
+    component: Home
+  }
 ]
 
 const router = new VueRouter({

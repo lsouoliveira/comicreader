@@ -5,9 +5,10 @@
 </template>
 
 <script>
-export default {
-	name: 'CustomHeader',
-	components: {
-	}
-};
+import Vue from 'vue'
+import Component from 'vue-class-component'
+
+@Component
+export default class CustomHeader extends Vue {
+}
 </script>
