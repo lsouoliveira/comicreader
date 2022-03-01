@@ -23,7 +23,7 @@ parser_factory = ParserFactory()
 
 def add_book(book_file):
     """Return the book successfully persisted."""
-    filename, file_extension = file_utils.extract_extension_and_secure(book_file.filename)
+    filename, file_extension = file_utils.extract_extension(book_file.filename)
 
     if not file_extension in ALLOWED_EXTENSIONS:
         raise FileNotSupported(book_file.filename)

@@ -13,7 +13,7 @@ class Config:
     RESTX_MASK_SWAGGER = False
     CELERY_BROKER_URL = 'redis://redis:6379/0'
     CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
-
+    BOOKS_PROCESSING_FOLDER='uploads/processing'
 
 class DevelopmentConfig(Config):
     # uncomment the line below to use postgres

@@ -3,6 +3,8 @@ from flask.app import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_script import Manager
+from flask_cors import CORS
+
 import json
 from celery import Celery
 from config import Config
@@ -26,6 +28,7 @@ def create_app() -> Flask:
 
     initialize_extensions(app)
     register_blueprints(app) 
+
     return app
 
 def initialize_extensions(app):
@@ -35,6 +38,11 @@ def initialize_extensions(app):
 
     @app.after_request
     def after_request(response):
+        response.headers.add('Content-Type', 'application/json')
+        response.headers.add('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS')
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+
         if int(response.status_code) >= 400:
             try:
                 response_data = json.loads(response.get_data())
@@ -52,4 +60,3 @@ def register_blueprints(app):
     from .main import main_blueprint
 
     app.register_blueprint(main_blueprint, url_prefix="/v1")
-

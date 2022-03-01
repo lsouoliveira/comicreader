@@ -58,7 +58,7 @@ class BookBookmark(Resource):
     @api.marshal_with(BookDto.get_book, envelope="data")
     def put(self, id):
         data = request.json
-        return bookmark(id, data['page'])
+        return bookmark(id, data['page'], data['percent'])
 
 @api.route('/<id>/mark-as-read')
 @api.param('id', 'The book identifier')

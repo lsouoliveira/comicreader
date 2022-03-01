@@ -17,10 +17,11 @@ def get_book_by_id(id: int):
 
     return book
 
-def bookmark(id: int, page: int):
+def bookmark(id: int, page: int, percent: float):
     book = get_book_by_id(id)
 
     book.reading_progress.page = page
+    book.reading_progress.percent = percent
 
     return save(book)
 

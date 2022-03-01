@@ -11,8 +11,8 @@ from app.models import BookFormat
 
 BOOKS_EXTRACTED_FOLDER = "uploads/books"
 BOOKS_PROCESSING_FOLDER = "uploads/processing"
-THUMBNAIL_FOLDER = "public/thumbnails"
-THUMBNAIL_SIZE = (320, 200)
+THUMBNAIL_FOLDER = "public/images"
+THUMBNAIL_SIZE = (200, 320)
 
 def extract_archive(path: str, filename: str, book_format: BookFormat) -> None:
     """Extract a book file to target folder."""
@@ -37,6 +37,7 @@ def get_comic_page(book_id: int, page_number: int) -> str:
 
     if path.exists(book_folder):
         pages = [f for f in listdir(book_folder)]
+        pages.sort(key=lambda x: int(x.split('.')[0]))
 
         if page_number < 1 or page_number > len(pages):
             raise ResourceNotFound(page_number)

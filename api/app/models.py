@@ -3,6 +3,10 @@ import datetime
 from enum import Enum
 from sqlalchemy.sql import func
 from sqlalchemy.dialects.postgresql import ENUM
+from uuid import uuid4
+
+def generate_uuid(context):
+    return str(uuid4())
 
 class BookType(Enum):
     comic = 1
@@ -14,7 +18,7 @@ class Book(db.Model):
     """ Book Model for storing book related details """
     __tablename__ = "book"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.String, primary_key=True, default=generate_uuid)
     cover_image = db.Column(db.String(512), nullable=False)
     num_pages = db.Column(db.Integer, nullable=False, default=0)
     book_type = db.Column("book_type", ENUM(BookType, name="booktype_enum"), nullable=False)
@@ -97,6 +101,7 @@ class ReadingProgress(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     page = db.Column(db.Integer, nullable=False, default=1)
+    percent = db.Column(db.Float, nullable=False, default=0)
     read = db.Column(db.Boolean, nullable=False, default=False)
     book_id = db.Column(db.Integer, db.ForeignKey("book.id"))
     created_at = db.Column(db.DateTime, nullable=False, server_default=db.func.now())

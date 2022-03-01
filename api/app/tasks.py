@@ -4,7 +4,7 @@ from . import celery
 from flask import current_app
 from app.main.service import book_service
 from app.main.service import archive_service
-from app.models import BookFormat, ProcessStatus 
+from app.models import ProcessStatus 
 
 
 @celery.task(name="app.tasks.extract_archive")
@@ -17,7 +17,7 @@ def extract_archive(book_id: int) -> None:
     except:
         return
 
-    book_path = "{}/{}".format(book_service.BOOKS_PROCESSING_FOLDER,
+    book_path = "{}/{}".format(archive_service.BOOKS_PROCESSING_FOLDER,
             book.book_process.file_id) 
 
     try:
