@@ -25,7 +25,7 @@ def extract_archive(path: str, filename: str, book_format: BookFormat) -> None:
         raise Exception()
 
     with open(path, "rb") as f:
-        parser.read(f.read())
+        parser.parse(f.read())
 
         parser.extract_to(book_extracted_path)
 

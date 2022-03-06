@@ -2,8 +2,10 @@ version: "3.3"
 services:
   redis:
     image: redis
-  web:
+    container_name: "redis"
+  api:
     build: .
+    container_name: "comic_reader_api"
     ports:
       - "5000:5000"
     depends_on:
@@ -12,6 +14,7 @@ services:
       - .:/app
   worker:
     build: .
+    container_name: "celery_worker"
     command: celery -A celery_worker.celery worker --pool=solo --loglevel=info 
     depends_on:
       - "redis"

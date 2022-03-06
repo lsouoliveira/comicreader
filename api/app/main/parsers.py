@@ -2,109 +2,103 @@ from abc import ABC, abstractmethod
 import zipfile
 import io
 import os
-from typing import Optional, Tuple
-
-from werkzeug.utils import secure_filename
+from typing import Optional, Tuple, IO
+from PIL import Image
 
 from app.main.util import file_utils 
 from app.models import BookFormat
 
-ALLOWED_COMIC_IMAGES_EXT = ["png", "jpg", "jpeg"]
+ALLOWED_COMIC_IMAGES_EXTENSIONS = [".png", ".jpg", ".jpeg", ".gif"]
+
 
 class InvalidImageType(Exception):
     def __init__(self):
-        super.__init__()
+        pass
+
+class InvalidFileFormat(Exception):
+    def __init__(self):
+        pass
 
 class Parser(ABC):
-    @abstractmethod
-    def read(self, data: bytes) -> None:
-        pass
+    data: IO[bytes]
 
     @abstractmethod
     def get_cover(self) -> Tuple[str, bytes]:
         pass
+
+    def parse(self, data: bytes) -> None:
+        self.data = io.BytesIO(data)
+
+        if not self.is_valid():
+            raise InvalidFileFormat()
 
     @abstractmethod
     def count_pages(self) -> int:
         pass
 
     @abstractmethod
+    def is_valid(self) -> bool:
+        pass
+
+    @abstractmethod
     def extract_to(self, path: str) -> None:
         pass
 
-"""
-TODO: validate all images from zip file
-"""
 class CbzParser(Parser):
-    file = None
-
-    def read(self, data: bytes) -> None:
-        self.file = io.BytesIO(data)
 
     def get_cover(self) -> Tuple[str, bytes]:
-        with zipfile.ZipFile(self.file, 'r') as cbz:
-            cover_file = self.get_first_file(cbz) 
-            _, ext = file_utils.extract_extension(cover_file.name) 
+        with zipfile.ZipFile(self.data, 'r') as _:
+            cover_file = self.get_first_image()
 
-            if not ext in ALLOWED_COMIC_IMAGES_EXT:
+            if not cover_file:
                 raise InvalidImageType()
 
-            return secure_filename(cover_file.name), cover_file.read_bytes() 
+            return cover_file.name, cover_file.read_bytes()
+
+    def is_valid(self):
+        return True
 
     def count_pages(self):
-        with zipfile.ZipFile(self.file, 'r') as f:
-            root_path = zipfile.Path(f)
-            members = [root_path]
+        return len(self._get_valid_images_paths())
 
-            num_pages = 0
+    def _iter_files(self):
+        with zipfile.ZipFile(self.data, 'r') as file:
+            root_path = zipfile.Path(file)
+            members = [root_path]
 
             while len(members) > 0:
                 member = members.pop(0)
 
                 if member.is_file():
-                    num_pages += 1
+                    yield member
                     continue
 
-                for m in member.iterdir():
-                    members.append(m)
-
-            return num_pages
+                new_members = sorted(list(member.iterdir()), key=lambda x: x.name)
+                members += new_members
 
     def extract_to(self, path: str) -> None:
-        with zipfile.ZipFile(self.file, 'r') as f:
-            root_path = zipfile.Path(f)
-            members = [root_path]
+        file_index = 1
 
-            file_index = 1
+        if not os.path.exists(path):
+            os.mkdir(path)
+        
+        for image_path in self._get_valid_images_paths():
+            output_path = '{}/{}.{}'.format(path, str(file_index), 'webp')
 
-            if not os.path.exists(path):
-                os.mkdir(path)
+            with Image.open(io.BytesIO(image_path.read_bytes())) as im:
+                im.save(output_path)
 
-            while len(members) > 0:
-                member = members.pop(0)
+            file_index += 1
 
-                if member.is_file():
-                    _, ext = file_utils.extract_extension(member.name) 
+    def _get_valid_images_paths(self):
+        return list(filter(lambda x: self._is_image_valid(x.name), self._iter_files()))
 
-                    with open('{}/{}.{}'.format(path, file_index, ext), 'wb') as image_file:
-                        image_file.write(member.read_bytes())
+    def _is_image_valid(self, filename):
+        _, file_extension = file_utils.extract_extension(filename)
+        return file_extension in ALLOWED_COMIC_IMAGES_EXTENSIONS
 
-                    file_index += 1
-                    continue
-
-                for m in member.iterdir():
-                    members.append(m)
-
-    def get_first_file(self, archive) -> zipfile.Path:
-        root_path = zipfile.Path(archive)
-
-        while root_path.is_dir():
-            for member in root_path.iterdir():
-                if member.is_dir():
-                    root_path = member
-                    break
-                return member
-        return root_path
+    def get_first_image(self):
+        return (self._get_valid_images_paths() or [None])[0]
 
 
 class ParserFactory:

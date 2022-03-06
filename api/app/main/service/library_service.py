@@ -9,14 +9,14 @@ from app import tasks
 import traceback
 import uuid
 
-ALLOWED_EXTENSIONS = ['cbz']
+ALLOWED_EXTENSIONS = ['.cbz']
 
 BOOK_TYPE = {
-        'cbz': models.BookType.comic
+        '.cbz': models.BookType.comic
         }
 
 BOOK_FORMAT = {
-        'cbz': models.BookFormat.cbz
+        '.cbz': models.BookFormat.cbz
         }
 
 parser_factory = ParserFactory() 
@@ -31,10 +31,13 @@ def add_book(book_file):
     book_format = BOOK_FORMAT[file_extension]
     file_data = book_file.read()
 
-    parser = create_parser(file_data, book_format, book_file)
+    parser = create_parser(book_format, book_file)
+    parser.parse(file_data)
+
     image_name, image_data = parser.get_cover()
 
     thumbnail_filename = archive_service.save_thumbnail(image_data, image_name) 
+
     book_file_id = archive_service.save_book_for_processing(
         file_data, file_extension
     )
@@ -67,12 +70,10 @@ def add_book(book_file):
 
     return book
 
-def create_parser(file_data, book_format, book_file):
+def create_parser(book_format, book_file):
     parser = parser_factory.create(book_format) 
 
     if not parser:
         raise FileNotSupported(book_file.filename)
-
-    parser.read(file_data)
 
     return parser

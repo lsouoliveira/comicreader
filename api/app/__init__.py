@@ -7,23 +7,23 @@ from flask_cors import CORS
 
 import json
 from celery import Celery
-from config import Config
+from config import get_config
 
+flask_env = os.getenv('FLASK_ENV', default='development')
+current_config = get_config(flask_env)
 
 db = SQLAlchemy()
 manager = Manager()
 migrate = Migrate()
 celery = Celery(
         __name__,
-        broker=Config.CELERY_BROKER_URL,
-        result_backend=Config.CELERY_RESULT_BACKEND)
+        broker=current_config.CELERY_BROKER_URL,
+        result_backend=current_config.CELERY_RESULT_BACKEND)
 
 def create_app() -> Flask:
     app = Flask(__name__)
 
-    CONFIG_TYPE = os.getenv('CONFIG_TYPE', default='config.DevelopmentConfig')
-    app.config.from_object(CONFIG_TYPE)
-
+    app.config.from_object(current_config)
     celery.conf.update(app.config)
 
     initialize_extensions(app)

@@ -28,5 +28,6 @@ def extract_archive(book_id: int) -> None:
         traceback.print_exc()
         book.book_process.status = ProcessStatus.error
     finally:
+        print(book.book_process.status)
         os.remove(book_path)
         book_service.save(book)
