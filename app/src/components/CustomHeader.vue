@@ -1,5 +1,5 @@
 <template>
-	<v-app-bar app dense elevation="1" color="surface">
+	<v-app-bar app dark color="primary">
 		<slot />
 	</v-app-bar>
 </template>

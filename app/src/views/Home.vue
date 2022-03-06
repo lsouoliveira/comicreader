@@ -12,20 +12,34 @@
 					<v-row no-gutters justify="center">
 						<v-col md="5">
 							<v-text-field
-								solo
-								placeholder="Type a comic name"
+                filled
+                label="Search for a comic name"
 								append-icon="mdi-magnify"
 								hide-details/>
 						</v-col>
 					</v-row>
 				</div>
-				<book-gallery :data="books" />
+				<book-gallery
+          :data="books"
+          :loading="isBookGalleryLoading"
+          @remove="handleRemoveBook"
+          @mark-as-read="handleMarkAsRead"
+          @book-unavailable="handleBookUnavailable"
+        />
 			</v-container>
 			<file-upload-dialog
         :show="isFileDialogOpened"
         @close="isFileDialogOpened = false"
         @fileDropped="handleFileDropped"
         :uploadedFiles="uploadedFiles"
+      />
+      <generic-confirmation-dialog
+        title="Remove book?"
+        description="are you sure you want to remove this book?"
+        confirmButtonValue="Remove"
+        :show="showRemoveBookConfirmation"
+        @confirm="handleRemoveButtonConfirm"
+        @close="showRemoveBookConfirmation = false"
       />
 		</template>
 	</default-layout>
@@ -38,7 +52,8 @@ import DefaultLayout from './../layout/DefaultLayout.vue'
 import Logo from './../components/Logo.vue'
 import FileUploadDialog from './../components/FileUploadDialog.vue'
 import BookGallery from './../components/BookGallery.vue'
-import Book from '../types/book'
+import GenericConfirmationDialog from './../components/GenericConfirmationDialog.vue'
+import { Book, PROCESS_STATUS } from '../types/book'
 import { UploadedFile } from '../types/uploaded_file'
 
 @Component({
@@ -46,11 +61,14 @@ import { UploadedFile } from '../types/uploaded_file'
     DefaultLayout,
     Logo,
     FileUploadDialog,
-    BookGallery
+    BookGallery,
+    GenericConfirmationDialog
   }
 })
 export default class Home extends Vue {
   isFileDialogOpened = false;
+  showRemoveBookConfirmation = false
+  bookIdToRemove = null
 
   mounted() {
     this.getBooks("")
@@ -65,9 +83,9 @@ export default class Home extends Vue {
     const files = target.files
 
     if(files && files.length) {
-      const fileToUpload = files[0]
-
-      this.createBook(fileToUpload)
+      Array.from(files).forEach((fileToUpload) => {
+        this.createBook(fileToUpload)
+      })
     }
   }
 
@@ -92,20 +110,57 @@ export default class Home extends Vue {
     return books.map((book: any) => {
       const titleMetafield = book.meta.find((meta: any) => meta.key === 'title')
       const title = titleMetafield && titleMetafield.value 
-
+      
       return {
         id: book.id,
         thumbnailUrl: book.cover_image,
         title: title || '',
-        reader_url: this.createReaderUrl(book.id, book.book_type) 
+        readerUrl: this.createReaderUrl(book.id, book.book_type),
+        read: book.reading_progress.read,
+        status: PROCESS_STATUS.findIndex(status => status === book.book_process.status)
       }
     })
+  }
+
+  get isBookGalleryLoading(): boolean {
+    return this.$store.state['books'].isFetching
   }
 
   createReaderUrl(bookId, bookType) {
     switch(bookType) {
       case "BookType.comic":
         return `/readers/comic-reader/${bookId}` 
+    }
+  }
+
+  handleRemoveBook(bookId) {
+    this.bookIdToRemove = bookId
+    this.showRemoveBookConfirmation = true
+  }
+
+  removeBook(bookId) {
+    this.$store.dispatch('books/removeBook', bookId)
+  }
+
+  handleRemoveButtonConfirm() {
+    this.removeBook(this.bookIdToRemove)
+  }
+
+  markAsRead(bookId) {
+    this.$store.dispatch('books/markAsRead', bookId)
+  }
+
+  handleMarkAsRead(bookId) {
+    this.markAsRead(bookId)
+  }
+
+  handleBookUnavailable(e) {
+    const { status } = e
+
+    switch(status) {
+      case 0:
+        alert('Book in processing')
+        return
     }
   }
 

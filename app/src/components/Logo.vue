@@ -1,5 +1,5 @@
 <template>
-	<v-toolbar-title class="logo primary--text"><a href="/">Comic Reader</a></v-toolbar-title>
+	<v-toolbar-title class="logo"><router-link to="/" class="white--text">Comic Reader</router-link></v-toolbar-title>
 </template>
 
 <script lang="ts">
@@ -12,10 +12,6 @@ export default class Logo extends Vue {
 </script>
 
 <style scoped>
-.logo {
-	font-weight: bold;
-}
-
 .logo a {
 	text-decoration: none;
 }

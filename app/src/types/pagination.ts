@@ -1,5 +1,5 @@
-export default interface Pagination {
+export interface Pagination {
   page: number,
-  pagesCount: number,
-  pageSize: number
+  total_pages: number,
+  items_per_page: number
 }

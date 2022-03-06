@@ -1,39 +1,38 @@
-import api from "./api";
-import Book from "../types/book";
+import { ComicReaderApi } from "./api";
+import { GetBooksResponse, GetBookResponse } from '../types/api'
 import { UploadedFile, UploadedFileStatus } from '../types/uploaded_file'
 
 const FILE_KEY = 'file'
 
-/** BookService has all api calls related to book's domain. */
-class BookService {
+class BookApi extends ComicReaderApi {
 	createBook(file: File, onUploadProgress: (e: Event) => void): Promise<any> {
     const formData = this.createFileUploadFormData(file)
     const config   = this.createFileUploadConfig(onUploadProgress) 
 
-		return api.post(
+		return this.instance.post<GetBookResponse>(
 			"/books/",
 			formData,
       config
 		)
 	}
 
-  getBooks(query: string, page: number, pageSize: number): Promise<any> {
+  getBooks(query: string, page: number, pageSize: number) {
     const config = {
       params: {
         query
       }
     }
-    return api.get("/books", config)
+    return this.instance.get<GetBooksResponse>("/books", config)
   }
 
-  getBook(bookId: string): Promise<any> {
-    return api.get(`/books/${bookId}`)
+  getBook(bookId: string) {
+    return this.instance.get<GetBookResponse>(`/books/${bookId}`)
   }
 
-  bookmark(id: string, bookmarkData: any): Promise<any> {
+  bookmark(id: string, bookmarkData: any) {
     const { page, percent } = bookmarkData
 
-    return api.put(`/books/${id}/bookmark`, { page, percent })
+    return this.instance.put(`/books/${id}/bookmark`, { page, percent })
   }
 
   createUploadedFile(file: File): UploadedFile {
@@ -63,4 +62,4 @@ class BookService {
   }
 }
 
-export default new BookService();
+export default new BookApi();

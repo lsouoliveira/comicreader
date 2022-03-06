@@ -1,6 +1,6 @@
 <template>
 	<v-app>
-		<v-app-bar app dark color="primary" v-if="isControlsEnabled">
+		<v-app-bar app dark v-if="isControlsEnabled">
 			<v-toolbar-title class="title">{{this.book && this.book.title}}</v-toolbar-title>
 			<v-spacer/>
 			<v-menu offset-y>
@@ -52,10 +52,18 @@
 				/>
 			</div>
 			<loading :show="isLoadingComic || !isComicReaderReady" />
+      <div class="sync-loading">
+        <v-progress-circular
+          indeterminate
+          size="16"
+          width="2"
+          color="dark"
+          v-show="isBookmarking"/>
+          <v-icon size="16" color="dark" v-show="!isBookmarking">mdi-check</v-icon>
+      </div>
 		</v-main>
 		<v-app-bar
 			fixed
-			color="primary"
 			dark
 			bottom
 			dense
@@ -74,7 +82,7 @@ import PageCounter from './../components/PageCounter.vue'
 import ZoomControl from './../components/ZoomControl.vue'
 import ComicReader from './../components/ComicReader.vue'
 import Loading from './../components/Loading.vue'
-import BookService from './../services/BookService'
+import BookApi from './../services/book_api'
 
 const API_URL = process.env.VUE_APP_COMIC_READER_API
 
@@ -121,7 +129,7 @@ export default {
       }
 
       this.bookmarkTimeout = setTimeout(() => {
-        BookService.bookmark(this.book.id, { page: this.page, percent: e.percent })
+        this.$store.dispatch('books/bookmark', { bookId: this.book.id, bookmarkData: { page: this.page, percent: e.percent } })
       }, this.bookmarkInterval);
 		},
 		handleComicReaderPageChange(newPage) {
@@ -308,7 +316,7 @@ export default {
 			}
 		},
     async loadBook(bookId) {
-      BookService.getBook(bookId)
+      BookApi.getBook(bookId)
         .then(res => {
           const data = res.data
           const book = data.data 
@@ -340,7 +348,10 @@ export default {
 			return {
 				"main-wrapper--padding-bottom": this.isControlsEnabled
 			}
-		}
+		},
+    isBookmarking() {
+      return this.$store.state['books'].isBookmarking
+    }
   },
 	mounted() {
     this.comicBookId = this.$route.params.id
@@ -366,4 +377,9 @@ export default {
 	pointer-events: auto;
 }
 
+.sync-loading {
+  position: fixed;
+  top: 8px;
+  right: 16px;
+}
 </style>

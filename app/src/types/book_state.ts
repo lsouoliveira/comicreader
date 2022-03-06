@@ -1,11 +1,13 @@
 import { UploadedFile } from './uploaded_file'
-import Book from './book'
-import Pagination from './pagination'
+import { Book } from './book'
+import { Pagination } from './pagination'
 
 export default interface BookState {
   filesUploaded: UploadedFile[],
-  books: Array<Book>,
+  books: Book[],
   isFetching: boolean,
   errors: any,
-  pagination: Pagination
+  pagination: Pagination,
+  query: string,
+  isBookmarking: boolean
 }
