@@ -1,0 +1,49 @@
+version: "3.3"
+
+volumes:
+  redis_data:
+  postgres_data:
+  uploads_data:
+  public_data:
+
+services:
+  redis:
+    image: redis
+    container_name: "redis"
+    volumes:
+      - redis_data:/data
+  api:
+    build: .
+    container_name: "comic_reader_api"
+    ports:
+      - "5001:5000"
+    depends_on:
+      - "redis"
+      - "postgres"
+    volumes:
+      - uploads_data:/app/uploads
+      - public_data:/app/public
+    environment:
+      - FLASK_ENV=production
+    env_file: .env.production
+  postgres:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_DB=${DB_NAME}
+  worker:
+    build: .
+    container_name: "comic_reader_celery_worker"
+    command: celery -A celery_worker.celery worker --pool=solo --loglevel=info 
+    depends_on:
+      - "redis"
+      - "postgres"
+    environment:
+      - FLASK_ENV=production
+    env_file: .env.production
+    volumes:
+      - uploads_data:/app/uploads
+      - public_data:/app/public

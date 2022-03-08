@@ -57,7 +57,7 @@ class BookProcess(db.Model):
             nullable=False
     )
     file_id = db.Column(db.String(512))
-    book_id = db.Column(db.Integer, db.ForeignKey("book.id"))
+    book_id = db.Column(db.String, db.ForeignKey("book.id"))
     created_at = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
     updated_at = db.Column(
             db.DateTime,
@@ -83,7 +83,7 @@ class Metadata(db.Model):
     key = db.Column(db.String(512), nullable=False)
     value = db.Column(db.String(512), nullable=False)
     data_type = db.Column("data_type", ENUM(DataType, name="datatype_enum"), nullable=False)
-    book_id = db.Column(db.Integer, db.ForeignKey("book.id"))
+    book_id = db.Column(db.String, db.ForeignKey("book.id"))
     created_at = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
     updated_at = db.Column(
             db.DateTime,
@@ -103,7 +103,7 @@ class ReadingProgress(db.Model):
     page = db.Column(db.Integer, nullable=False, default=1)
     percent = db.Column(db.Float, nullable=False, default=0)
     read = db.Column(db.Boolean, nullable=False, default=False)
-    book_id = db.Column(db.Integer, db.ForeignKey("book.id"))
+    book_id = db.Column(db.String, db.ForeignKey("book.id"))
     created_at = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
     updated_at = db.Column(
             db.DateTime,

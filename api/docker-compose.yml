@@ -5,7 +5,7 @@ services:
     container_name: "redis"
   api:
     build: .
-    container_name: "comic_reader_api"
+    container_name: "comic_reader_api_dev"
     ports:
       - "5000:5000"
     depends_on:
