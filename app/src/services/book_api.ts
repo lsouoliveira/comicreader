@@ -29,6 +29,10 @@ class BookApi extends ComicReaderApi {
     return this.instance.get<GetBookResponse>(`/books/${bookId}`)
   }
 
+  deleteBook(bookId: string) {
+    return this.instance.delete<void>(`/books/${bookId}`)
+  }
+
   bookmark(id: string, bookmarkData: any) {
     const { page, percent } = bookmarkData
 

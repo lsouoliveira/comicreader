@@ -1,0 +1,58 @@
+version: "3.3"
+
+services:
+  comic-reader-redis:
+    image: redis
+    container_name: "comic-reader-redis"
+    volumes:
+      - ${DATA_PATH}/.comic_reader/redis:/data
+
+  comic-reader-api:
+    build: ./api
+    container_name: "comic-reader-api"
+    ports:
+      - "5000:5000"
+    depends_on:
+      - "redis"
+      - "postgres"
+    volumes:
+      - ${DATA_PATH}/.comic_reader/uploads:/app/uploads
+      - ${DATA_PATH}/.comic_reader/public:/app/public
+    environment:
+      - FLASK_ENV=production
+    env_file: .env
+      
+  comic-reader-db:
+    image: postgres
+    container_name: comic-reader-db
+    volumes:
+      - ${DATA_PATH}/.comic_reader/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_DB=${DB_NAME}
+
+  worker:
+    build: ./api
+    container_name: "comic-reader-worker"
+    command: celery -A celery_worker.celery worker --pool=solo --loglevel=info 
+    depends_on:
+      - "redis"
+      - "postgres"
+    volumes:
+      - ${DATA_PATH}/.comic_reader/uploads:/app/uploads
+      - ${DATA_PATH}/.comic_reader/public:/app/public
+    environment:
+      - FLASK_ENV=production
+    env_file: .env
+
+  comic-reader-app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile.build
+    container_name: comic-reader-app
+    env_file: .env
+    ports:
+      - "8080:80"
+    volumes:
+      - ".:/app"

@@ -2,13 +2,13 @@
 	<div class="book-card">
     <router-link :to="readerUrl" @click.native.capture="handleSelectBook">
       <div class='cover'>
-        <img :src='thumbnailUrl' :style="coverImageStylesObject"/>
+        <img :src='thumbnailUrl' :style="coverImageStylesObject" :title="title"/>
       </div>
     </router-link>
 		<div class="mt-1 book-card__info-header">
 				<span class="font-weight-bold text-body-1 secondary--text book-card__title me-1">{{title}}</span>
 			<div>
-      <v-menu offset-y v-if="false">
+      <v-menu offset-y>
         <template v-slot:activator="{ on, attrs }">
           <v-btn
             class="secondary--text"

@@ -67,13 +67,11 @@ export default {
 <style scoped>
 .book-gallery {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(9.14rem, auto));
+	grid-template-columns: repeat(auto-fill, minmax(9.14rem, 1fr));
 	grid-gap: 1.14rem;
-  justify-content: flex-start;
 }
 
 .book-gallery__item {
-	max-width: 9.14rem;
   transition: all 0.5s;
 }
 

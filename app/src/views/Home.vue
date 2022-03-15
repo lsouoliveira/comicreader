@@ -15,17 +15,20 @@
                 filled
                 label="Search for a comic name"
 								append-icon="mdi-magnify"
-								hide-details/>
+								hide-details
+                v-model="query"
+                @input="handleQueryInput"/>
 						</v-col>
 					</v-row>
 				</div>
 				<book-gallery
           :data="books"
-          :loading="isBookGalleryLoading"
+          :loading="isFetchingBooks"
           @remove="handleRemoveBook"
           @mark-as-read="handleMarkAsRead"
           @book-unavailable="handleBookUnavailable"
         />
+        <p v-if="!books.length && !isFetchingBooks" class="text-center">Empty library</p>
 			</v-container>
 			<file-upload-dialog
         :show="isFileDialogOpened"
@@ -56,6 +59,8 @@ import GenericConfirmationDialog from './../components/GenericConfirmationDialog
 import { Book, PROCESS_STATUS } from '../types/book'
 import { UploadedFile } from '../types/uploaded_file'
 
+const QUERY_INPUT_TIMEOUT = 500
+
 @Component({
   components: {
     DefaultLayout,
@@ -69,9 +74,15 @@ export default class Home extends Vue {
   isFileDialogOpened = false;
   showRemoveBookConfirmation = false
   bookIdToRemove = null
+  query = ''
+  queryInputTimeout = null
+  isFetchingBooks = true
+  isSearchEnabled = true
 
   mounted() {
-    this.getBooks("")
+    this.getBooks().finally(_ => {
+      this.isFetchingBooks = false
+    })
   }
 
   handleOpenFileDialog(): void {
@@ -93,8 +104,8 @@ export default class Home extends Vue {
     this.$store.dispatch('books/createBook', file)
   }
 
-  getBooks(query: string): void {
-    this.$store.dispatch('books/getBooks', query)
+  getBooks(query: string) {
+    return this.$store.dispatch('books/getBooks', query)
   }
 
   get theme(): string  {
@@ -120,10 +131,6 @@ export default class Home extends Vue {
         status: PROCESS_STATUS.findIndex(status => status === book.book_process.status)
       }
     })
-  }
-
-  get isBookGalleryLoading(): boolean {
-    return this.$store.state['books'].isFetching
   }
 
   createReaderUrl(bookId, bookType) {
@@ -162,6 +169,25 @@ export default class Home extends Vue {
         alert('Book in processing')
         return
     }
+  }
+
+  handleQueryInput() {
+    if(!this.isSearchEnabled) {
+      return
+    }
+
+    const query = this.query
+
+    this.getBooks(this.query)
+    this.isSearchEnabled = false
+
+    this.queryInputTimeout = setTimeout(() => {
+      if(this.query != query) {
+        this.getBooks(this.query)
+      }
+
+      this.isSearchEnabled = true
+    }, QUERY_INPUT_TIMEOUT)
   }
 
 }

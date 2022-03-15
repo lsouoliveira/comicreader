@@ -98,6 +98,7 @@ const actions = {
       context.commit('setIsFetching', false)
   },
   removeBook(context: ActionContext<BookState, BookState>, bookId: string): void {
+    const response = BookApi.deleteBook(bookId)
     context.commit('removeBook', bookId)
   },
   markAsRead(context: ActionContext<BookState, BookState>, bookId: string): void {
