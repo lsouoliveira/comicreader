@@ -2,23 +2,21 @@ import os
 from flask.app import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_script import Manager
-from flask_cors import CORS
 
 import json
 from celery import Celery
-from config import get_config
+from app.config import get_config
 
 flask_env = os.getenv('FLASK_ENV', default='development')
 current_config = get_config(flask_env)
 
 db = SQLAlchemy()
-manager = Manager()
 migrate = Migrate()
 celery = Celery(
         __name__,
         broker=current_config.CELERY_BROKER_URL,
         result_backend=current_config.CELERY_RESULT_BACKEND)
+
 
 def create_app() -> Flask:
     app = Flask(__name__)

@@ -5,18 +5,21 @@ services:
     container_name: "redis"
   api:
     build: .
-    container_name: "comic_reader_api_dev"
+    container_name: "comic-reader-api-dev"
     ports:
-      - "5000:5000"
+      - "5001:5000"
     depends_on:
       - "redis"
     volumes:
       - .:/app
+    env_file: .env
+
   worker:
     build: .
-    container_name: "celery_worker"
+    container_name: "celery-worker"
     command: celery -A celery_worker.celery worker --pool=solo --loglevel=info 
     depends_on:
       - "redis"
     volumes:
       - .:/app
+    env_file: .env
