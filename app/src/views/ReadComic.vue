@@ -353,10 +353,20 @@ export default {
       return this.$store.state['books'].isBookmarking
     }
   },
+  watch: {
+    pages() {
+      for(let i = 1; i < this.pages.length; i++) {
+        if(this.pages[i].index < this.pages[i - 1].index) {
+          alert('wrong order')
+        }
+      }
+    }
+  },
 	mounted() {
     this.comicBookId = this.$route.params.id
     this.loadBook(this.comicBookId)
 	}
+  
 }
 </script>
 

@@ -1,5 +1,6 @@
 <template>
 	<div class="comic" :style="bottomMargin">
+    <h1 class="red--text" style="position: fixed; top: 50%;">{{scrollY}}</h1>
 		<custom-loading :show="isLoadingImagesBefore"/>
 		<comic-page
 			:src="page.url"
@@ -71,7 +72,8 @@ export default {
 			mouseScrollDrag: null,
 			mouseEvents: null,
 			isSetupDone: false,
-			isInfiniteScrollEnabled: false
+			isInfiniteScrollEnabled: false,
+      scrollY: 0
 		}
 	},
 	computed: {
@@ -86,12 +88,12 @@ export default {
 		handleImageLoaded(pageImage) {
 			this.$emit('page-load', pageImage);
 		},
-		calculatePageHeight(pageHeight) {
+		calculatePageHeight(pageHeight, pageWidth) {
 			switch(this.displayMode) {
 				case "fit-height":
 					return window.innerHeight;
 				case "fit-width":
-					return window.innerWidth;
+					return pageHeight * (window.innerWidth / pageWidth);
 				case "zoom":
 					return this.zoomScale * pageHeight;
 			}
@@ -105,7 +107,7 @@ export default {
 
 			for(let i = 0; i < visiblePages.length; i++) {
 				const page = visiblePages[i];
-				const pageHeight = this.calculatePageHeight(page.height);
+				const pageHeight = this.calculatePageHeight(page.height, page.width);
 				const comicHalfPage = comicHeight + (pageHeight + PAGE_MARGIN_TOP) / 2;
 
 				if(scrollY <= comicHalfPage) {
@@ -159,7 +161,7 @@ export default {
 					this.$emit("load-more", true);
 				}
 
-				if(loadBeforeThreshold <= firstPageIndex && firstPageIndex  > 1) {
+				if(loadBeforeThreshold <= firstPageIndex && firstPageIndex > 1) {
 					this.$emit("load-more", false);
 				}
 			}
