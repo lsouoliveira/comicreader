@@ -15,8 +15,3 @@ Comic Reader is a web app that helps you to manage your comic books. It gives yo
 ## Supported formats
 
 - Cbz
-
-## Getting started
-
-- [Api]()
-- [Web app]()
